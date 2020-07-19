@@ -137,6 +137,12 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 	}
 
 	function sortFileNames(a:SummaryLine, b:SummaryLine):Int {
+		if (a.prefix < b.prefix) {
+			return -1;
+		}
+		if (a.prefix > b.prefix) {
+			return 1;
+		}
 		if (a.file < b.file) {
 			return -1;
 		}
@@ -165,8 +171,9 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 				continue;
 			}
 			if (prefix.startsWith(lastPrefix)) {
-				if (count == lastCount) {
+				if ((count == lastCount) || (count > 30)) {
 					lastPrefix = prefix;
+					lastCount = count;
 					continue;
 				}
 				if (!prefixes.contains(lastPrefix)) {
@@ -181,12 +188,17 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 			prefixes.push(lastPrefix);
 		}
 		for (line in lines) {
+			var matchedPrefix:String = "";
 			for (prefix in prefixes) {
 				if (line.file.startsWith(prefix)) {
-					line.prefix = line.file.substr(0, prefix.length + 1);
-					line.file = line.file.substr(prefix.length + 1);
-					break;
+					if (prefix.length > matchedPrefix.length) {
+						matchedPrefix = prefix;
+					}
 				}
+			}
+			if (matchedPrefix.length > 0) {
+				line.prefix = line.file.substr(0, matchedPrefix.length);
+				line.file = line.file.substr(matchedPrefix.length);
 			}
 		}
 	}
@@ -204,7 +216,7 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 	function addPrefixes(prefixCandidates:Map<String, Int>, fileName:String) {
 		var folder:String = new Path(fileName).dir;
 		while (folder.length > 0) {
-			addPrefix(prefixCandidates, folder);
+			addPrefix(prefixCandidates, folder + "/");
 			folder = Path.directory(folder);
 		}
 	}
