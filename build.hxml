@@ -1,0 +1,56 @@
+-cp src
+-cp srcDemo
+
+# --macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
+--macro instrument.Instrumentation.coverage(["demo"], ["srcDemo"], [])
+# -D profiler-console-detail-reporter
+# -D profiler-console-missing-reporter
+# -D profiler-console-summary-reporter
+# -D profiler-console-hierarchy-reporter
+# -D profiler-csv-file=profiler/summary.csv
+# -D profiler-csv-reporter
+# -D profiler-d3-file=profiler/flame.json
+-D profiler-d3-reporter
+# -D profiler-cpuprofile-file=profiler/Profile.cpuprofile
+# -D profiler_cpuprofile_reporter
+
+-D coverage-console-summary-reporter
+-D coverage-console-file-summary-reporter
+-D coverage-console-missing-reporter
+-D coverage-lcov-reporter
+-D coverage-codecov-reporter
+# -D coverage-emma-reporter
+
+# -D debug-instrumentation
+# -D debug-log-expression
+
+--run demo.MyTestApp
+-main demo.MyTestApp
+
+# --run demo.Hello
+# -main demo.Hello
+
+# -lib hxnodejs
+# -js run.js
+# -cmd node run.js
+
+# -lib hxjava
+# --jvm run.jar
+# -cmd java -jar run.jar
+
+# -lib hxjava
+# --java out
+# -cmd java -jar out/MyTestApp.jar
+
+# -php out
+# -cmd php out/index.php
+
+# -D HXCPP_GC_GENERATIONAL
+# -cpp out
+# -cmd out/MyTestApp
+
+# -cs out
+# -cmd mono out/bin/MyTestApp.exe
+
+# -neko run.n
+# -cmd neko run.n

@@ -1,0 +1,13 @@
+{
+  "name": "haxe-instrument",
+  "version": "1.0.0",
+  "description": "",
+  "author": {
+    "name": "Alexander Blum",
+    "email": "Alexander.Blum@gmail.com"
+  },
+  "devDependencies": {
+    "lix": "^15.9.0"
+  },
+  "license": "MIT"
+}

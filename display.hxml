@@ -1,0 +1,29 @@
+-cp src
+-cp srcDemo
+-cp tests
+
+-lib utest
+
+# --macro instrument.Instrumentation.init(["demo"], ["haxe"])
+-D profiler-data-folder=prof
+-D profiler-console-detail-reporter
+-D profiler-console-missing-reporter
+-D profiler-console-summary-reporter
+-D profiler-console-hierarchy-reporter
+-D profiler-csv-reporter
+-D profiler-d3-reporter
+-D profiler_cpuprofile_reporter
+-D debug-instrumentation
+-D coverage-console-reporter
+-D coverage-console-file-summary-reporter
+-D coverage-console-summary-reporter
+-D coverage-console-detail-reporter
+-D coverage-lcov-reporter
+-D coverage-codecov-reporter
+-D coverage-emma-reporter
+
+--run demo.MyTestApp
+demo.MyTestApp
+instrument.profiler.Profiler
+instrument.coverage.CoverageContext
+instrument.Instrumentation

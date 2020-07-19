@@ -1,0 +1,14 @@
+out/**
+dump/**
+.svn/**
+.unittest/**
+profiler/**
+run.js
+run.jar
+run.n
+flame.json
+lcov.info
+coverage.xml
+*.cpuprofile
+coverage.json
+tests/.missing-data.json

@@ -1,0 +1,18 @@
+{
+	"name": "instrument",
+	"url": "https://github.com/AlexHaxe/haxe-instrument",
+	"license": "MIT",
+	"tags": [
+		"instrument",
+		"coverage",
+		"profile"
+	],
+	"description": "A profiling and coverage library for Haxe",
+	"version": "1.0.0",
+	"releasenote": "initial release - see CHANGELOG for details.",
+	"contributors": [
+		"AlexHaxe"
+	],
+	"dependencies": {},
+	"classPath": "src"
+}

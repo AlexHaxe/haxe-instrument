@@ -1,0 +1,9 @@
+-cp src
+-cp tests
+
+-lib utest
+-lib test-adapter
+
+-main TestMain
+
+--run TestMain
