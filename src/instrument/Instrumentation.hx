@@ -104,6 +104,7 @@ class Instrumentation {
 		Compiler.addGlobalMetadata("Sys", "@:build(instrument.Instrumentation.sysExitField())", true, true, false);
 		Compiler.addGlobalMetadata("haxe.EntryPoint", "@:build(instrument.Instrumentation.entrypointRunField())", true, true, false);
 		coverageContext = new CoverageContext();
+		Sys.print("Instrumenting ");
 	}
 
 	static function filterType(pack:String, location:Location):InstrumentationType {
@@ -227,6 +228,7 @@ class Instrumentation {
 			case Profiling:
 			case Both:
 		}
+		Sys.print(".");
 
 		var typeInfo:TypeInfo = new TypeInfo(coverageContext.nextId(), pack, cls.name, location.locationToString(), location.file.toString(),
 			location.range.start.line, location.range.end.line);
@@ -837,6 +839,8 @@ class Instrumentation {
 			switch (t) {
 				case TClassDecl(c):
 					if (c.get().name == "CoverageTypes") {
+						Sys.println("");
+						Sys.println("");
 						return;
 					}
 				case TEnumDecl(e):

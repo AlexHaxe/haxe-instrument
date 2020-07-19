@@ -39,6 +39,7 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 		var overallColumn:Int = 7;
 		var totalWidth:Int = fileColumn + typeColumn + fieldColumn + branchColumn + expressionColumn + lineColumn + overallColumn + 6 * 3;
 
+		output("");
 		output("".rpad("=", totalWidth));
 		var line:String = '${"".lpad(" ", fileColumn)}' + delimiter + '${"Types".rpad(" ", typeColumn)}' + delimiter + '${"Fields".rpad(" ", fieldColumn)}'
 			+ delimiter + '${"Branches".rpad(" ", branchColumn)}' + delimiter + '${"Expression".rpad(" ", expressionColumn)}' + delimiter
@@ -51,11 +52,13 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 		output(line);
 		output("".rpad("=", totalWidth));
 		var lastPrefix:String = "";
+		var first:Bool = true;
 		for (l in lines) {
-			if (lastPrefix.length <= 0) {
+			if (first) {
 				if (l.prefix.length > 0) {
 					output('[${l.prefix}]');
 					lastPrefix = l.prefix;
+					first = false;
 				}
 			} else {
 				if (lastPrefix != l.prefix) {
@@ -101,6 +104,7 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 				+ context.expressionsCovered, overallColumn);
 		output(line);
 		output("".rpad("=", totalWidth));
+		output("");
 	}
 
 	function longestFileName(lines:Array<SummaryLine>):Int {
