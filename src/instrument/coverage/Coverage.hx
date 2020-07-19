@@ -23,16 +23,16 @@ class Coverage {
 	public static function endCoverage() {
 		var reporters:Array<ICoverageReporter> = [];
 
-		#if coverage_console_summary_reporter
-		reporters.push(new instrument.coverage.reporter.ConsoleCoverageSummaryReporter());
+		#if coverage_console_missing_reporter
+		reporters.push(new instrument.coverage.reporter.ConsoleMissingCoverageReporter());
 		#end
 
 		#if coverage_console_file_summary_reporter
 		reporters.push(new instrument.coverage.reporter.ConsoleCoverageFileSummaryReporter());
 		#end
 
-		#if coverage_console_missing_reporter
-		reporters.push(new instrument.coverage.reporter.ConsoleMissingCoverageReporter());
+		#if coverage_console_summary_reporter
+		reporters.push(new instrument.coverage.reporter.ConsoleCoverageSummaryReporter());
 		#end
 
 		#if coverage_lcov_reporter
