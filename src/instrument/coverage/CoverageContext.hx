@@ -2,7 +2,6 @@ package instrument.coverage;
 
 import haxe.Json;
 import instrument.coverage.TypeInfo.TypeInfoStruct;
-import instrument.coverage.reporter.ICoverageReporter;
 
 class CoverageContext {
 	static var lock:Null<Mutex> = null;
@@ -108,7 +107,7 @@ class CoverageContext {
 			linesCovered += type.linesCovered;
 		}
 		calcFileStatistic();
-		calcPackageStatistic();
+		calcPackageStatistic(files);
 	}
 
 	function calcFileStatistic() {
@@ -119,7 +118,7 @@ class CoverageContext {
 			if (fileMap.exists(type.file)) {
 				fileInfo = fileMap.get(type.file);
 			} else {
-				fileInfo = new FileInfo(type.file);
+				fileInfo = new FileInfo(type.file, type.pack);
 				fileMap.set(type.file, fileInfo);
 			}
 			fileInfo.addType(type);
@@ -133,7 +132,7 @@ class CoverageContext {
 		}
 	}
 
-	function calcPackageStatistic() {
+	function calcPackageStatistic(allFiles:Array<FileInfo>) {
 		packagesCovered = 0;
 		var packageMap:Map<String, PackageInfo> = new Map<String, PackageInfo>();
 		for (type in types) {
@@ -141,7 +140,7 @@ class CoverageContext {
 			if (packageMap.exists(type.pack)) {
 				packInfo = packageMap.get(type.pack);
 			} else {
-				packInfo = new PackageInfo(type.pack);
+				packInfo = new PackageInfo(type.pack, allFiles);
 				packageMap.set(type.pack, packInfo);
 			}
 			packInfo.addType(type);

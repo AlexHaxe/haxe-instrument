@@ -11,6 +11,8 @@ class ConsoleCoveragePackageSummaryReporter implements ICoverageReporter {
 		for (pack in context.packages) {
 			var summary:PackageSummaryLine = {
 				pack: pack.pack,
+				fileCount: pack.files.length,
+				filesCovered: pack.filesCovered,
 				typeCount: pack.types.length,
 				typesCovered: pack.typesCovered,
 				fieldCount: pack.fieldCount,
@@ -26,28 +28,40 @@ class ConsoleCoveragePackageSummaryReporter implements ICoverageReporter {
 		}
 
 		var packColumn:Int = longestPackageName(lines) + 1;
+		var fileColumn:Int = summaryColumnLen(context.files.length, context.filesCovered);
 		var typeColumn:Int = summaryColumnLen(context.types.length, context.typesCovered);
 		var fieldColumn:Int = summaryColumnLen(context.fieldCount, context.fieldsCovered);
 		var branchColumn:Int = summaryColumnLen(context.branchCount, context.branchesCovered);
 		var expressionColumn:Int = summaryColumnLen(context.expressionCount, context.expressionsCovered);
 		var lineColumn:Int = summaryColumnLen(context.lineCount, context.linesCovered);
 		var overallColumn:Int = 7;
-		var totalWidth:Int = packColumn + typeColumn + fieldColumn + branchColumn + expressionColumn + lineColumn + overallColumn + 6 * 3;
+		var totalWidth:Int = packColumn
+			+ fileColumn
+			+ typeColumn
+			+ fieldColumn
+			+ branchColumn
+			+ expressionColumn
+			+ lineColumn
+			+ overallColumn
+			+ 7 * 3;
 
 		output("");
 		output("".rpad("=", totalWidth));
-		var line:String = '${"".lpad(" ", packColumn)}' + delimiter + '${"Types".rpad(" ", typeColumn)}' + delimiter + '${"Fields".rpad(" ", fieldColumn)}'
-			+ delimiter + '${"Branches".rpad(" ", branchColumn)}' + delimiter + '${"Expression".rpad(" ", expressionColumn)}' + delimiter
-			+ '${"Lines".rpad(" ", lineColumn)}' + delimiter + '${"Overall".rpad(" ", overallColumn)}';
+		var line:String = '${"".lpad(" ", packColumn)}' + delimiter + '${"Files".rpad(" ", fileColumn)}' + delimiter + '${"Types".rpad(" ", typeColumn)}'
+			+ delimiter + '${"Fields".rpad(" ", fieldColumn)}' + delimiter + '${"Branches".rpad(" ", branchColumn)}' + delimiter
+			+ '${"Expression".rpad(" ", expressionColumn)}' + delimiter + '${"Lines".rpad(" ", lineColumn)}' + delimiter
+			+ '${"Overall".rpad(" ", overallColumn)}';
 		output(line);
-		line = '${"Package".rpad(" ", packColumn)}' + delimiter + '${"Rate".rpad(" ", typeColumn - 3)}Num' + delimiter
-			+ '${"Rate".rpad(" ", fieldColumn - 3)}Num' + delimiter + '${"Rate".rpad(" ", branchColumn - 3)}Num' + delimiter
-			+ '${"Rate".rpad(" ", expressionColumn - 3)}Num' + delimiter + '${"Rate".rpad(" ", lineColumn - 3)}Num' + delimiter
-			+ '${"".rpad(" ", overallColumn)}';
+		line = '${"Package".rpad(" ", packColumn)}' + delimiter + '${"Rate".rpad(" ", fileColumn - 3)}Num' + delimiter
+			+ '${"Rate".rpad(" ", typeColumn - 3)}Num' + delimiter + '${"Rate".rpad(" ", fieldColumn - 3)}Num' + delimiter
+			+ '${"Rate".rpad(" ", branchColumn - 3)}Num' + delimiter + '${"Rate".rpad(" ", expressionColumn - 3)}Num' + delimiter
+			+ '${"Rate".rpad(" ", lineColumn - 3)}Num' + delimiter + '${"".rpad(" ", overallColumn)}';
 		output(line);
 		output("".rpad("=", totalWidth));
 		for (l in lines) {
 			line = l.pack.rpad(" ", packColumn)
+				+ delimiter
+				+ summaryColumn(l.fileCount, l.filesCovered, fileColumn)
 				+ delimiter
 				+ summaryColumn(l.typeCount, l.typesCovered, typeColumn)
 				+ delimiter
@@ -65,6 +79,8 @@ class ConsoleCoveragePackageSummaryReporter implements ICoverageReporter {
 		}
 		output("".rpad("=", totalWidth));
 		line = "Total:".lpad(" ", packColumn)
+			+ delimiter
+			+ summaryColumn(context.files.length, context.filesCovered, fileColumn)
 			+ delimiter
 			+ summaryColumn(context.types.length, context.typesCovered, typeColumn)
 			+ delimiter
@@ -143,6 +159,8 @@ class ConsoleCoveragePackageSummaryReporter implements ICoverageReporter {
 
 typedef PackageSummaryLine = {
 	var pack:String;
+	var fileCount:Int;
+	var filesCovered:Int;
 	var typeCount:Int;
 	var typesCovered:Int;
 	var fieldCount:Int;

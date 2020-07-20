@@ -2,6 +2,7 @@ package instrument.coverage;
 
 class FileInfo {
 	public var file:String;
+	public var pack:String;
 
 	public var types:Array<TypeInfo>;
 
@@ -15,8 +16,9 @@ class FileInfo {
 	public var lineCount:Int;
 	public var linesCovered:Int;
 
-	public function new(file:String) {
+	public function new(file:String, pack:String) {
 		this.file = file;
+		this.pack = pack;
 
 		typesCovered = 0;
 		fieldCount = 0;
