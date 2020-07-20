@@ -1,22 +1,23 @@
 -cp src
 -cp srcDemo
 
-# --macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
---macro instrument.Instrumentation.coverage(["demo"], ["srcDemo"], [])
+--macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
+--macro instrument.Instrumentation.coverage(["demo"], ["src", "srcDemo"], [])
 # -D profiler-console-detail-reporter
-# -D profiler-console-missing-reporter
+-D profiler-console-missing-reporter
 # -D profiler-console-summary-reporter
-# -D profiler-console-hierarchy-reporter
+-D profiler-console-hierarchy-reporter
 # -D profiler-csv-file=profiler/summary.csv
 # -D profiler-csv-reporter
 # -D profiler-d3-file=profiler/flame.json
--D profiler-d3-reporter
+# -D profiler-d3-reporter
 # -D profiler-cpuprofile-file=profiler/Profile.cpuprofile
 # -D profiler_cpuprofile_reporter
 
 -D coverage-console-summary-reporter
 -D coverage-console-file-summary-reporter
--D coverage-console-missing-reporter
+-D coverage-console-package-summary-reporter
+# -D coverage-console-missing-reporter
 -D coverage-lcov-reporter
 -D coverage-codecov-reporter
 # -D coverage-emma-reporter

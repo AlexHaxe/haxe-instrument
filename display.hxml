@@ -16,8 +16,9 @@
 -D debug-instrumentation
 -D coverage-console-reporter
 -D coverage-console-file-summary-reporter
+-D coverage-console-package-summary-reporter
 -D coverage-console-summary-reporter
--D coverage-console-detail-reporter
+-D coverage-console-missing-reporter
 -D coverage-lcov-reporter
 -D coverage-codecov-reporter
 -D coverage-emma-reporter

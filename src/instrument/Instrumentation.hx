@@ -185,17 +185,17 @@ class Instrumentation {
 		return newLevel;
 	}
 
-	static function filterTypeMeta(meta:MetaAccess, level:InstrumentationType):InstrumentationType {
+	static function filterTypeMeta(meta:MetaAccess, type:InstrumentationType):InstrumentationType {
 		if (meta.has("ignoreInstrument") || meta.has(":ignoreInstrument") || meta.has("ignoreInstrumentation") || meta.has(":ignoreInstrumentation")) {
 			return None;
 		}
 		if (meta.has("ignoreCoverage") || meta.has(":ignoreCoverage")) {
-			level = level.remove(Coverage);
+			type = type.remove(Coverage);
 		}
 		if (meta.has("ignoreProfiler") || meta.has(":ignoreProfiler")) {
-			level = level.remove(Profiling);
+			type = type.remove(Profiling);
 		}
-		return level;
+		return type;
 	}
 
 	static function instrumentFields():Null<Array<Field>> {

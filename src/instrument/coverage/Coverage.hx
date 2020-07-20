@@ -31,6 +31,10 @@ class Coverage {
 		reporters.push(new instrument.coverage.reporter.ConsoleCoverageFileSummaryReporter());
 		#end
 
+		#if coverage_console_package_summary_reporter
+		reporters.push(new instrument.coverage.reporter.ConsoleCoveragePackageSummaryReporter());
+		#end
+
 		#if coverage_console_summary_reporter
 		reporters.push(new instrument.coverage.reporter.ConsoleCoverageSummaryReporter());
 		#end

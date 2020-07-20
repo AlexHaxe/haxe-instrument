@@ -60,7 +60,7 @@ class TestCoverage implements ITest {
 		runTestee("coverage.testcases.SwitchBranches");
 	}
 
-	public function testWhileBrnaches() {
+	public function testWhileBranches() {
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
 		data.addMissing(9, Branch);
 		data.addMissing(13, Expression);

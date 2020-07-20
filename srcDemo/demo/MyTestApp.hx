@@ -37,7 +37,6 @@ class MyTestApp {
 		opBoolOr(1);
 		opBoolOr(2);
 		opBoolOr(4);
-
 		if (false)
 			Sys.exit(0);
 	}

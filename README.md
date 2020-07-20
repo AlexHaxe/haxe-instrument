@@ -1,26 +1,9 @@
 # Coverage and Profiling instrumentation library
 
-profiling and coverage will instrument your code to include calls to profile and coverage data collector logic.
+profiling and coverage will instrument your code to include calls to profile and coverage data collector logic.  
 for that purpose all inlining of included types will be disabled.
 
-## end instrumentation detection
-
-instrument tries to find your `main` and all calls to `Sys.exit` to set up automatic detection of program exit. however if you exit your program by any other means or if your main function is excluded from instrumentation, then you might have to add a call / calls to instrument's `endProfiler` or `endCoverage` functions:
-
-```haxe
-#if instrument
-instrument.coverage.Coverage.endCoverage(); // when measuring coverage
-instrument.profiler.Profiler.endProfiler(); // when profiling
-#end
-```
-
-## exclude types from instrumentation
-
-you can exclude types from instrumentation by adding metadata to a type:
-
-- `@ignoreInstrument` or `@:ignoreInstrument` will ignore a type from all instrumentation
-- `@ignoreCoverage` or `@:ignoreCoverage` will ignore a type from coverage instrumentation
-- `@ignoreProfiler` or `@:ignoreProfiler` will ignore a type from profiler instrumentation
+for an example use of instrument run `haxe build.hxml` and play with different cli options (see commented out lines in `build.hxml`)
 
 ## Coverage
 
@@ -55,7 +38,21 @@ Overall:                      90.12%
 
 overall coverage is `(covered fields + covered branches + covered expressions) / (total fields + total branches + total expressions)`
 
-`-D coverage-console-file-summary-reporter` - prints a sile by file summary of coverage stats to your console
+`-D coverage-console-package-summary-reporter` - prints a package summary of coverage stats to your console
+
+```text
+==============================================================================================================
+                 | Types        | Fields         | Branches       | Expression      | Lines          | Overall
+Package          | Rate     Num | Rate       Num | Rate       Num | Rate        Num | Rate       Num |
+==============================================================================================================
+demo._MyTestApp  |   100%   1/1 |    50%     1/2 |     0%     0/0 |    50%      1/2 |    50%     1/2 |     50%
+demo             |    50%   1/2 | 93.75%   15/16 | 80.95%   34/42 |    95%   95/100 | 88.88%   80/90 |  91.13%
+==============================================================================================================
+          Total: | 66.66%   2/3 | 88.88%   16/18 | 80.95%   34/42 | 94.11%   96/102 | 88.04%   81/92 |  90.12%
+==============================================================================================================
+```
+
+`-D coverage-console-file-summary-reporter` - prints a file by file summary of coverage stats to your console
 
 ```text
 ===========================================================================================================
@@ -70,7 +67,7 @@ MyTestApp.hx  |   100%   2/2 | 94.11%   16/17 | 80.95%   34/42 | 95.04%   96/101
 ===========================================================================================================
 ```
 
-`-D coverage-console-detail-reporter` - prints a line for every type, field, branch and expression with no coverage
+`-D coverage-console-missing-reporter` - prints a line for every type, field, branch and expression with no coverage
 
 ### lcov coverage reporter
 
@@ -190,3 +187,22 @@ writes a json file compatible with d3-flame-graph javascript library.f ilename d
 work in progress - supposed to write a file in .cpuprofile format to be used in e.g. `vscode-js-profile-flame` VSCode extension.
 
 `-D profiler-cpuprofile-reporter`
+
+## end instrumentation detection
+
+instrument tries to find your `main` and all calls to `Sys.exit` to set up automatic detection of program exit. however if you exit your program by any other means or if your main function is excluded from instrumentation, then you might have to add a call / calls to instrument's `endProfiler` or `endCoverage` functions:
+
+```haxe
+#if instrument
+instrument.coverage.Coverage.endCoverage(); // when measuring coverage
+instrument.profiler.Profiler.endProfiler(); // when profiling
+#end
+```
+
+## exclude types from instrumentation
+
+you can exclude types from instrumentation by adding metadata to a type:
+
+- `@ignoreInstrument` or `@:ignoreInstrument` will ignore a type from all instrumentation
+- `@ignoreCoverage` or `@:ignoreCoverage` will ignore a type from coverage instrumentation
+- `@ignoreProfiler` or `@:ignoreProfiler` will ignore a type from profiler instrumentation
