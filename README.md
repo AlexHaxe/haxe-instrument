@@ -145,7 +145,26 @@ srcDemo/demo/Hello.hx:5: Hello Haxe
 srcDemo/demo/Hello.hx:4: Hello.main 1 1.59811973571777344ms
 ```
 
-`-D profiler-console-missing-reporter` - prints a list of all calls that didn't exit properly. (might indicate issues in instrument library)
+`-D profiler-console-missing-reporter` - prints a list of all calls that didn't exit properly. (might indicate an issue in instrument library)
+
+```text
+srcDemo/demo/Hello.hx:3: type Hello not covered
+srcDemo/demo/Hello.hx:4: field main not covered
+srcDemo/demo/Hello.hx:5: expression not covered
+srcDemo/demo/MyTestApp.hx:40: branch not covered
+srcDemo/demo/MyTestApp.hx:41: expression not covered
+srcDemo/demo/MyTestApp.hx:46: branch not covered
+srcDemo/demo/MyTestApp.hx:47: expression not covered
+srcDemo/demo/MyTestApp.hx:52: branch not covered
+srcDemo/demo/MyTestApp.hx:53: expression not covered
+srcDemo/demo/MyTestApp.hx:55: branch not covered
+srcDemo/demo/MyTestApp.hx:61: branch not covered
+srcDemo/demo/MyTestApp.hx:118: branch not covered
+srcDemo/demo/MyTestApp.hx:121: expression not covered
+srcDemo/demo/MyTestApp.hx:125: branch not covered
+srcDemo/demo/MyTestApp.hx:138: field download not covered
+srcDemo/demo/MyTestApp.hx:139: expression not covered
+```
 
 `-D profiler-console-hierarchy-reporter` - prints a hierachical summary of calls showing which function was called from what function, again listing all locations, fields, number opf invocations and duration
 
