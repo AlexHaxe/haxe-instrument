@@ -5,6 +5,8 @@ for that purpose all inlining of included types will be disabled.
 
 for an example use of instrument run `haxe build.hxml` and play with different cli options (see commented out lines in `build.hxml`)
 
+requires Haxe 4.1.x or higher
+
 ## Coverage
 
 ```hxml
@@ -15,6 +17,9 @@ for an example use of instrument run `haxe build.hxml` and play with different c
 - include packages - takes an array of package names you want to collect coverage data on. names are matched against fully qualified type names using `StringTools.startsWith`
 - include folders - array of folders containing code for coverage data collection. `Compiler.include` is used to make sure your types get included
 - exclude packages - array of packages to ignore, e.g. because they are for a different target. again using `StringTools.startsWith` to match fully qualified type names against list
+
+coverage instrumentation runs independently of a test framework. so you can create a coverage report from a "normal" run of your code if you like.  
+confirmed to work with utest and munit.
 
 ### console coverage reporters
 
@@ -75,16 +80,18 @@ writes coverage data using lcov format to a file. filename defaults to `lcov.inf
 includes full coverage data down to lines and branches (visualisation of partially covered branches might depend on your tooling, some may show it, some won't).
 
 ```hxml
--D coverage-lcov-reporter or -D coverage-lcov-reporter=lcov.info
+-D coverage-lcov-reporter
+-D coverage-lcov-reporter=lcov.info
 ```
 
-### Codecov coverage reporter
+### Codecov coverage reporter (untested)
 
 writes coverage data using Codecov's Json coverage foramt. filename defaults to `codecov.json` in your workspace root. you can set a different name and folder. Codecov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 includes line coverage for each file, partial branches show up as "1/2" or "3/4".
 
 ```hxml
--D coverage-codecov-reporter or -D coverage-codecov-reporter=codecov.json
+-D coverage-codecov-reporter
+-D coverage-codecov-reporter=codecov.json
 ```
 
 ### emma coverage reporter (untested)
@@ -93,7 +100,8 @@ writes coverage data using emma xml format to a file. filename defaults to `emma
 only supports coverage down to method level (no branch and line coverage)
 
 ```hxml
--D coverage-emma-reporter or -D coverage-emma-reporter=emma-coverage.xml
+-D coverage-emma-reporter
+-D coverage-emma-reporter=emma-coverage.xml
 ```
 
 ### JaCoCo Xml coverage reporter (untested)
@@ -175,7 +183,8 @@ srcDemo/demo/Hello.hx:4: Hello.main 1 1.59811973571777344ms
 writes profiling data to a CSV file using `thread;invocations;total time in ms;class;function;location` columns. filename defaults to `summary.csv` in your workspace root. you can set a different name and folder. csv reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 
 ```hxml
--D profiler-csv-reporter or -D profiler-csv-reporter=summary.xml
+-D profiler-csv-reporter
+-D profiler-csv-reporter=summary.xml
 ```
 
 ### D3 Flamegraph profiling reporter
@@ -183,18 +192,22 @@ writes profiling data to a CSV file using `thread;invocations;total time in ms;c
 writes a json file compatible with d3-flame-graph javascript library.f ilename defaults to `flame.json` in your workspace root. you can set a different name and folder. d3 reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 
 ```hxml
--D profiler-d3-reporter or -D profiler-d3-reporter=flame.json
+-D profiler-d3-reporter
+-D profiler-d3-reporter=flame.json
 ```
 
 ### .cpuprofile profiling reporter (WIP)
 
 work in progress - supposed to write a file in .cpuprofile format to be used in e.g. `vscode-js-profile-flame` VSCode extension.
 
-`-D profiler-cpuprofile-reporter=profiler.cpuprofile`
+```hxml
+-D profiler-cpuprofile-reporter
+-D profiler-cpuprofile-reporter=profiler.cpuprofile
+```
 
 ## end instrumentation detection
 
-instrument tries to find your `main` and all calls to `Sys.exit` to set up automatic detection of program exit. however if you exit your program by any other means or if your main function is excluded from instrumentation, then you might have to add a call / calls to instrument's `endProfiler` or `endCoverage` functions:
+instrument tries to find your `main` function and all calls to `Sys.exit` to set up automatic detection of program exit. however if you exit your program by any other means or if your main function is excluded from instrumentation, then you might have to add a call to instrument's `endProfiler` or `endCoverage` functions:
 
 ```haxe
 #if instrument
