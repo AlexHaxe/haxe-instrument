@@ -176,7 +176,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 
 	function appendCoverageFile(text:String) {
 		#if nodejs
-		js.node.Fs.appendFileSync(Instrumentation.getFileName(fileName), text);
+		js.node.Fs.appendFileSync(Instrumentation.workspaceFileName(fileName), text);
 		#elseif sys
 		var file:FileOutput = sys.io.File.append(Instrumentation.workspaceFileName(fileName));
 		file.writeString(text.toString());

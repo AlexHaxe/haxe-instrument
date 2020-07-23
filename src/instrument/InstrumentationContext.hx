@@ -1,10 +1,8 @@
 package instrument;
 
 import haxe.macro.Expr;
-import instrument.coverage.CoverageContext;
 import instrument.coverage.FieldInfo;
 import instrument.coverage.TypeInfo;
-import instrument.profiler.Profiler;
 
 typedef InstrumentationContext = {
 	var pack:String;
@@ -13,6 +11,7 @@ typedef InstrumentationContext = {
 	var typeInfo:Null<TypeInfo>;
 	var anonFuncCounter:Int;
 	var isInline:Bool;
+	var isAbstract:Bool;
 	var allReturns:Bool;
 	var missingBranches:Array<Expr>;
 	var level:InstrumentationType;

@@ -98,7 +98,7 @@ class Instrumentation {
 			Compiler.include(pack, true, excludePackCoverage, includeFolderCoverage);
 		}
 
-		Context.onAfterTyping(onAfterTyping);
+		Context.onGenerate(onGenerate);
 	}
 
 	static function installMetadata() {
@@ -204,25 +204,54 @@ class Instrumentation {
 		if (Context.defined(DISPLAY)) {
 			return null;
 		}
-		var ref:Ref<ClassType> = Context.getLocalClass();
-		if (ref == null) {
-			return null;
-		}
-		var cls:ClassType = ref.get();
-		if (cls.isInterface || cls.name == null || cls.kind.match(KAbstractImpl(_)) || cls.isExtern) {
-			return null;
+
+		var packParts:Array<String>;
+		var name:String;
+		var module:String;
+		var pos:Position;
+		var isPrivate:Bool;
+		var isAbstract:Bool = false;
+		var meta:MetaAccess;
+		switch (Context.getLocalType()) {
+			case TInst(_.get() => type, _):
+				if (type.name == null || type.isExtern || type.isInterface) {
+					return null;
+				}
+				switch (type.kind) {
+					case KAbstractImpl(_.get() => abstractType):
+						packParts = abstractType.pack;
+						name = abstractType.name;
+						module = abstractType.module;
+						pos = abstractType.pos;
+						isPrivate = abstractType.isPrivate;
+						isAbstract = true;
+						meta = abstractType.meta;
+					default:
+						packParts = type.pack;
+						name = type.name;
+						module = type.module;
+						pos = type.pos;
+						isPrivate = type.isPrivate;
+						meta = type.meta;
+				}
+			default:
+				return null;
 		}
 
-		var pack:String = cls.pack.join(".");
-		var fullTypeName:String = if (cls.pack.length <= 0) {
-			cls.name;
+		if (isPrivate) {
+			packParts.pop();
+		}
+		var pack:String = packParts.join(".");
+
+		var fullTypeName:String = if (packParts.length <= 0) {
+			name;
 		} else {
-			pack + '.${cls.name}';
+			pack + '.${name}';
 		};
 
-		var location:Location = PositionTools.toLocation(cls.pos);
+		var location:Location = PositionTools.toLocation(pos);
 		var currentLevel:InstrumentationType = filterType(fullTypeName, location);
-		currentLevel = filterTypeMeta(cls.meta, currentLevel);
+		currentLevel = filterTypeMeta(meta, currentLevel);
 		switch (currentLevel) {
 			case None:
 				return null;
@@ -232,21 +261,21 @@ class Instrumentation {
 		}
 		Sys.print(".");
 
-		var typeInfo:TypeInfo = new TypeInfo(coverageContext.nextId(), pack, cls.name, location.locationToString(), location.file.toString(),
+		var typeInfo:TypeInfo = new TypeInfo(coverageContext.nextId(), pack, name, location.locationToString(), location.file.toString(),
 			location.range.start.line, location.range.end.line);
 		coverageContext.addType(typeInfo);
 		context = {
 			pack: pack,
-			className: cls.name,
-			pos: cls.pos,
+			className: name,
+			pos: pos,
 			typeInfo: typeInfo,
 			anonFuncCounter: 0,
 			isInline: false,
+			isAbstract: isAbstract,
 			allReturns: false,
 			level: currentLevel,
 			missingBranches: []
 		};
-
 		var fields:Array<Field> = Context.getBuildFields();
 		for (field in fields) {
 			instrumentField(field);
@@ -279,7 +308,7 @@ class Instrumentation {
 				trace("after " + fun.expr.toString());
 				#end
 			case FVar(type, expr) if (expr != null):
-				if (context.isInline) {
+				if (context.isAbstract || context.isInline) {
 					return;
 				}
 				initFieldContext(field);
@@ -293,7 +322,7 @@ class Instrumentation {
 				#end
 				field.kind = FVar(type, expr);
 			case FProp(get, set, type, expr) if (expr != null):
-				if (context.isInline) {
+				if (context.isAbstract || context.isInline) {
 					return;
 				}
 				initFieldContext(field);
@@ -763,7 +792,7 @@ class Instrumentation {
 			return null;
 		}
 		var cls:ClassType = ref.get();
-		if (cls.isInterface || cls.name == null || cls.kind.match(KAbstractImpl(_))) {
+		if (cls.isInterface || cls.name == null) {
 			return null;
 		}
 		var fields:Array<Field> = Context.getBuildFields();
@@ -804,7 +833,7 @@ class Instrumentation {
 			return null;
 		}
 		var cls:ClassType = ref.get();
-		if (cls.isInterface || cls.name == null || cls.kind.match(KAbstractImpl(_))) {
+		if (cls.isInterface || cls.name == null) {
 			return null;
 		}
 		var fields:Array<Field> = Context.getBuildFields();
@@ -836,48 +865,11 @@ class Instrumentation {
 		}
 	}
 
-	static function onAfterTyping(types:Array<ModuleType>) {
-		for (t in types) {
-			switch (t) {
-				case TClassDecl(c):
-					if (c.get().name == "CoverageTypes") {
-						Sys.println("");
-						Sys.println("");
-						return;
-					}
-				case TEnumDecl(e):
-				case TTypeDecl(t):
-				case TAbstract(a):
-			}
-		}
-		Instrumentation.coverageContext.sort();
+	static function onGenerate(types:Array<Type>) {
 		var typeData:String = haxe.Json.stringify(Instrumentation.coverageContext.types);
-		var isJava:Bool = false;
-		#if (java || jvm)
-		var typeDataArray:Array<String> = [];
-		final maxLength:Int = 65000;
-		while (typeData.length > 0) {
-			if (typeData.length > maxLength) {
-				typeDataArray.push(typeData.substr(0, maxLength));
-				typeData = typeData.substr(maxLength);
-			} else {
-				typeDataArray.push(typeData);
-				typeData = "";
-			}
-		}
-
-		var c = macro class CoverageTypes {
-			public var typesJson:Array<String> = $v{typeDataArray};
-		}
-		#else
-		var c = macro class CoverageTypes {
-			public var typesJson:String = $v{typeData};
-		}
-		#end
-
-		c.meta = [{name: ":keep", pos: c.pos}];
-		c.pack = ["instrument", "coverage"];
-		haxe.macro.Context.defineType(c);
+		Context.addResource(instrument.coverage.Coverage.RESOURCE_NAME, haxe.io.Bytes.ofString(typeData));
+		Sys.println("");
+		Sys.println("");
 	}
 	#end
 

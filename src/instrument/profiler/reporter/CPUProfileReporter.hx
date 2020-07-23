@@ -1,21 +1,22 @@
 package instrument.profiler.reporter;
 
 import haxe.Json;
-import haxe.io.Path;
 import haxe.macro.Context;
 import instrument.profiler.reporter.data.CPUProfile;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
 import instrument.profiler.summary.HierarchyCallData;
-#if (sys || nodejs)
-import sys.FileSystem;
-import sys.io.File;
-#end
 
+#if (sys || nodejs)
+#end
 // TODO fixme
 class CPUProfileReporter extends FileBaseReporter implements IProfilerReporter {
 	public function new(?fileName:Null<String>) {
+		#if macro
 		super(fileName, Context.definedValue("profiler-cpuprofile-reporter"), "profiler.cpuprofile");
+		#else
+		super(fileName, haxe.macro.Compiler.getDefine("profiler-cpuprofile-reporter"), "profiler.cpuprofile");
+		#end
 	}
 
 	public function startProfiler() {}

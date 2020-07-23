@@ -32,7 +32,7 @@ class ExpectedCoverageData {
 	}
 
 	public static function getMissingDataFile():String {
-		var fileName:String = Path.join([Instrumentation.baseFolder(), "tests", ".missing-data.json"]);
+		var fileName:String = Path.join([Instrumentation.workspaceFolder(), "tests", ".missing-data.json"]);
 		var folder:String = Path.directory(fileName);
 		if (folder.trim().length > 0) {
 			if (!FileSystem.exists(folder)) {

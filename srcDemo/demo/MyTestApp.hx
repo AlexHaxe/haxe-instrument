@@ -27,6 +27,17 @@ class MyTestApp {
 		whileLoop();
 		var sortCols = ["xxx"];
 
+		var role:Role = RoleAdmin;
+		switch (role) {
+			case RoleAdmin:
+				trace("admin");
+			case RoleEditor:
+			case RoleSales:
+				trace("");
+			case RoleCustomer:
+				trace("");
+		}
+
 		var orderBy:String = sortCols.map(function(value:String):String {
 			return value;
 		}).join(", ");
@@ -137,3 +148,10 @@ function moduleBody()
 
 function download():String
 	return "download";
+
+enum abstract Role(String) to String {
+	public var RoleAdmin = "admin";
+	public var RoleEditor = "editor";
+	public var RoleSales = "sales";
+	public var RoleCustomer = "customer";
+}

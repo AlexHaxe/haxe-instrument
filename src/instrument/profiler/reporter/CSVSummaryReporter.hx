@@ -12,7 +12,11 @@ import sys.io.File;
 
 class CSVSummaryReporter extends FileBaseReporter implements IProfilerReporter {
 	public function new(?fileName:Null<String>) {
+		#if macro
 		super(fileName, Context.definedValue("profiler-csv-reporter"), "profiler.csv");
+		#else
+		super(fileName, haxe.macro.Compiler.getDefine("profiler-csv-reporter"), "profiler.csv");
+		#end
 	}
 
 	public function startProfiler() {}

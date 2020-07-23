@@ -29,15 +29,15 @@ confirmed to work with utest and munit.
 =====================================
 Coverage summary
 =====================================
-packages                 2/2   (100%)
-types                    2/3 (66.66%)
+packages                 1/1   (100%)
+types                    2/4    (50%)
 fields                 16/18 (88.88%)
-branches               34/42 (80.95%)
-expressions           96/102 (94.11%)
+branches               35/46 (76.08%)
+expressions          100/108 (92.59%)
 files                    1/2    (50%)
-lines                  81/92 (88.04%)
+lines                 84/102 (82.35%)
 =====================================
-Overall:                      90.12%
+Overall:                      87.79%
 =====================================
 ```
 
@@ -46,30 +46,29 @@ overall coverage is `(covered fields + covered branches + covered expressions) /
 `-D coverage-console-package-summary-reporter` - prints a package summary of coverage stats to your console
 
 ```text
-=============================================================================================================================
-                 | Files        | Types        | Fields         | Branches       | Expression      | Lines          | Overall
-Package          | Rate     Num | Rate     Num | Rate       Num | Rate       Num | Rate        Num | Rate       Num |
-=============================================================================================================================
-demo._MyTestApp  |     0%   0/0 |   100%   1/1 |    50%     1/2 |     0%     0/0 |    50%      1/2 |    50%     1/2 |     50%
-demo             |    50%   1/2 |    50%   1/2 | 93.75%   15/16 | 80.95%   34/42 |    95%   95/100 | 88.88%   80/90 |  91.13%
-=============================================================================================================================
-          Total: |    50%   1/2 | 66.66%   2/3 | 88.88%   16/18 | 80.95%   34/42 | 94.11%   96/102 | 88.04%   81/92 |  90.12%
-=============================================================================================================================
+==========================================================================================================================
+            | Files        | Types        | Fields         | Branches       | Expression       | Lines           | Overall
+Package     | Rate     Num | Rate     Num | Rate       Num | Rate       Num | Rate         Num | Rate        Num |
+==========================================================================================================================
+demo        |    50%   1/2 |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 92.59%   100/108 | 82.35%   84/102 |  87.79%
+==========================================================================================================================
+     Total: |    50%   1/2 |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 92.59%   100/108 | 82.35%   84/102 |  87.79%
+==========================================================================================================================
 ```
 
 `-D coverage-console-file-summary-reporter` - prints a file by file summary of coverage stats to your console
 
 ```text
-===========================================================================================================
-              | Types        | Fields         | Branches       | Expression      | Lines          | Overall
-FileName      | Rate     Num | Rate       Num | Rate       Num | Rate        Num | Rate       Num |
-===========================================================================================================
+=============================================================================================================
+              | Types        | Fields         | Branches       | Expression       | Lines           | Overall
+FileName      | Rate     Num | Rate       Num | Rate       Num | Rate         Num | Rate        Num |
+=============================================================================================================
 [srcDemo/demo/]
-Hello.hx      |     0%   0/1 |     0%     0/1 |     0%     0/0 |     0%      0/1 |     0%     0/1 |      0%
-MyTestApp.hx  |   100%   2/2 | 94.11%   16/17 | 80.95%   34/42 | 95.04%   96/101 | 89.01%   81/91 |  91.25%
-===========================================================================================================
-       Total: | 66.66%   2/3 | 88.88%   16/18 | 80.95%   34/42 | 94.11%   96/102 | 88.04%   81/92 |  90.12%
-===========================================================================================================
+Hello.hx      |     0%   0/1 |     0%     0/1 |     0%     0/0 |     0%       0/1 |     0%      0/1 |      0%
+MyTestApp.hx  | 66.66%   2/3 | 94.11%   16/17 | 76.08%   35/46 | 93.45%   100/107 | 83.16%   84/101 |  88.82%
+=============================================================================================================
+       Total: |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 92.59%   100/108 | 82.35%   84/102 |  87.79%
+=============================================================================================================
 ```
 
 `-D coverage-console-missing-reporter` - prints a line for every type, field, branch and expression with no coverage
@@ -148,53 +147,63 @@ srcDemo/demo/Hello.hx:4: Hello.main 1 1.59811973571777344ms
 `-D profiler-console-missing-reporter` - prints a list of all calls that didn't exit properly. (might indicate an issue in instrument library)
 
 ```text
+======================
+== missing coverage ==
+======================
 srcDemo/demo/Hello.hx:3: type Hello not covered
 srcDemo/demo/Hello.hx:4: field main not covered
 srcDemo/demo/Hello.hx:5: expression not covered
-srcDemo/demo/MyTestApp.hx:40: branch not covered
-srcDemo/demo/MyTestApp.hx:41: expression not covered
-srcDemo/demo/MyTestApp.hx:46: branch not covered
-srcDemo/demo/MyTestApp.hx:47: expression not covered
-srcDemo/demo/MyTestApp.hx:52: branch not covered
-srcDemo/demo/MyTestApp.hx:53: expression not covered
-srcDemo/demo/MyTestApp.hx:55: branch not covered
-srcDemo/demo/MyTestApp.hx:61: branch not covered
-srcDemo/demo/MyTestApp.hx:118: branch not covered
-srcDemo/demo/MyTestApp.hx:121: expression not covered
-srcDemo/demo/MyTestApp.hx:125: branch not covered
-srcDemo/demo/MyTestApp.hx:138: field download not covered
-srcDemo/demo/MyTestApp.hx:139: expression not covered
+srcDemo/demo/MyTestApp.hx:31: branch not covered
+srcDemo/demo/MyTestApp.hx:35: branch not covered
+srcDemo/demo/MyTestApp.hx:36: expression not covered
+srcDemo/demo/MyTestApp.hx:37: branch not covered
+srcDemo/demo/MyTestApp.hx:38: expression not covered
+srcDemo/demo/MyTestApp.hx:51: branch not covered
+srcDemo/demo/MyTestApp.hx:52: expression not covered
+srcDemo/demo/MyTestApp.hx:57: branch not covered
+srcDemo/demo/MyTestApp.hx:58: expression not covered
+srcDemo/demo/MyTestApp.hx:63: branch not covered
+srcDemo/demo/MyTestApp.hx:64: expression not covered
+srcDemo/demo/MyTestApp.hx:66: branch not covered
+srcDemo/demo/MyTestApp.hx:72: branch not covered
+srcDemo/demo/MyTestApp.hx:129: branch not covered
+srcDemo/demo/MyTestApp.hx:132: expression not covered
+srcDemo/demo/MyTestApp.hx:136: branch not covered
+srcDemo/demo/MyTestApp.hx:149: field download not covered
+srcDemo/demo/MyTestApp.hx:150: expression not covered
+srcDemo/demo/MyTestApp.hx:152: type Role not covered
 ```
 
 `-D profiler-console-hierarchy-reporter` - prints a hierachical summary of calls showing which function was called from what function, again listing all locations, fields, number opf invocations and duration
 
 ```text
---------------------
--- Call Hierarchy --
---------------------
-+ <root> 8.11815261840820312ms
----+ thread-0 8.11815261840820312ms
-------+ srcDemo/demo/MyTestApp.hx:116: MyTestApp.main 1 3.99184226989746094ms
----------+ srcDemo/demo/MyTestApp.hx:6: MyTestApp.new 1 3.75390052795410156ms
-------------+ srcDemo/demo/MyTestApp.hx:72: MyTestApp.noBody 1 0.090122222900390625ms
-------------+ srcDemo/demo/MyTestApp.hx:84: MyTestApp.noBody2 1 0.0708103179931640625ms
-------------+ srcDemo/demo/MyTestApp.hx:75: MyTestApp.noBody3 2 0.228166580200195312ms
----------------+ srcDemo/demo/MyTestApp.hx:121: MyTestApp_Fields_.moduleBody 2 0.072956085205078125ms
-------------+ srcDemo/demo/MyTestApp.hx:87: MyTestApp.noBody5 1 0.030040740966796875ms
-------------+ srcDemo/demo/MyTestApp.hx:121: MyTestApp_Fields_.moduleBody 5 0.137090682983398438ms
-------------+ srcDemo/demo/MyTestApp.hx:4: MyTestApp.<anon-arrow-0> 1 0.031948089599609375ms
-------------+ srcDemo/demo/MyTestApp.hx:90: MyTestApp.noBody4 1 0.273942947387695312ms
----------------+ srcDemo/demo/MyTestApp.hx:19: MyTestApp.<anon-1> 2 0.196218490600585938ms
-------------------+ srcDemo/demo/MyTestApp.hx:87: MyTestApp.noBody5 2 0.041961669921875ms
-------------------+ srcDemo/demo/MyTestApp.hx:84: MyTestApp.noBody2 2 0.04482269287109375ms
-------------+ srcDemo/demo/MyTestApp.hx:62: MyTestApp.initTranslations 1 0.0598430633544921875ms
-------------+ srcDemo/demo/MyTestApp.hx:103: MyTestApp.noCover 1 0.0441074371337890625ms
-------------+ srcDemo/demo/MyTestApp.hx:95: MyTestApp.getInt 2 0.069141387939453125ms
-------------+ srcDemo/demo/MyTestApp.hx:110: MyTestApp.whileLoop 1 0.0400543212890625ms
-------------+ srcDemo/demo/MyTestApp.hx:30: MyTestApp.<anon-2> 1 0.0369548797607421875ms
-------------+ srcDemo/demo/MyTestApp.hx:55: MyTestApp.sortColsFunc 1 0.08392333984375ms
----------------+ srcDemo/demo/MyTestApp.hx:56: MyTestApp.<anon-3> 1 0.02288818359375ms
-------------+ srcDemo/demo/MyTestApp.hx:42: MyTestApp.switchVal 2 0.0870227813720703125ms
+====================
+== Call Hierarchy ==
+====================
++ <root> 9.17577743530273438ms
+---+ thread-0 9.17577743530273438ms
+------+ srcDemo/demo/MyTestApp.hx:141: MyTestApp.main 1 4.44388389587402344ms
+---------+ srcDemo/demo/MyTestApp.hx:6: MyTestApp.new 1 4.13799285888671875ms
+------------+ srcDemo/demo/MyTestApp.hx:97: MyTestApp.noBody 1 0.030994415283203125ms
+------------+ srcDemo/demo/MyTestApp.hx:109: MyTestApp.noBody2 1 0.0269412994384765625ms
+------------+ srcDemo/demo/MyTestApp.hx:100: MyTestApp.noBody3 2 0.159025192260742188ms
+---------------+ srcDemo/demo/MyTestApp.hx:146: MyTestApp_Fields_.moduleBody 2 0.0522136688232421875ms
+------------+ srcDemo/demo/MyTestApp.hx:112: MyTestApp.noBody5 1 0.02193450927734375ms
+------------+ srcDemo/demo/MyTestApp.hx:146: MyTestApp_Fields_.moduleBody 5 1.22761726379394531ms
+------------+ srcDemo/demo/MyTestApp.hx:4: MyTestApp.<anon-arrow-0> 1 0.02288818359375ms
+------------+ srcDemo/demo/MyTestApp.hx:115: MyTestApp.noBody4 1 0.294923782348632812ms
+---------------+ srcDemo/demo/MyTestApp.hx:19: MyTestApp.<anon-1> 2 0.210046768188476562ms
+------------------+ srcDemo/demo/MyTestApp.hx:112: MyTestApp.noBody5 2 0.03719329833984375ms
+------------------+ srcDemo/demo/MyTestApp.hx:109: MyTestApp.noBody2 2 0.0393390655517578125ms
+------------+ srcDemo/demo/MyTestApp.hx:87: MyTestApp.initTranslations 1 0.142812728881835938ms
+------------+ srcDemo/demo/MyTestApp.hx:128: MyTestApp.noCover 1 0.031948089599609375ms
+------------+ srcDemo/demo/MyTestApp.hx:120: MyTestApp.getInt 2 0.0612735748291015625ms
+------------+ srcDemo/demo/MyTestApp.hx:135: MyTestApp.whileLoop 1 0.0259876251220703125ms
+------------+ srcDemo/demo/MyTestApp.hx:41: MyTestApp.<anon-2> 1 0.0240802764892578125ms
+------------+ srcDemo/demo/MyTestApp.hx:80: MyTestApp.sortColsFunc 1 0.072956085205078125ms
+---------------+ srcDemo/demo/MyTestApp.hx:81: MyTestApp.<anon-3> 1 0.019073486328125ms
+------------+ srcDemo/demo/MyTestApp.hx:55: MyTestApp.switchVal 2 0.118017196655273438ms
+------------+ srcDemo/demo/MyTestApp.hx:69: MyTestApp.opBoolOr 3 0.70667266845703125ms
 ```
 
 ### CSV profiling reporter

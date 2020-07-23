@@ -3,6 +3,8 @@ package instrument.coverage;
 import instrument.coverage.reporter.ICoverageReporter;
 
 class Coverage {
+	public static var RESOURCE_NAME:String = "coverageTypeInfo";
+
 	/**
 	 * reports coverage data using reporters provided by caller
 	 *

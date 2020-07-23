@@ -1,20 +1,21 @@
 package instrument.profiler.reporter;
 
 import haxe.Json;
-import haxe.io.Path;
 import haxe.macro.Context;
 import instrument.profiler.reporter.data.D3FlameNode;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
 import instrument.profiler.summary.HierarchyCallData;
-#if (sys || nodejs)
-import sys.FileSystem;
-import sys.io.File;
-#end
 
+#if (sys || nodejs)
+#end
 class D3FlameHierarchyReporter extends FileBaseReporter implements IProfilerReporter {
 	public function new(?fileName:Null<String>) {
+		#if macro
 		super(fileName, Context.definedValue("profiler-d3-reporter"), "flame.json");
+		#else
+		super(fileName, haxe.macro.Compiler.getDefine("profiler-d3-reporter"), "flame.json");
+		#end
 	}
 
 	public function startProfiler() {}
