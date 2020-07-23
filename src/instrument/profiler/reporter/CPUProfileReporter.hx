@@ -2,7 +2,7 @@ package instrument.profiler.reporter;
 
 import haxe.Json;
 import haxe.io.Path;
-import haxe.macro.Compiler;
+import haxe.macro.Context;
 import instrument.profiler.reporter.data.CPUProfile;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
@@ -13,13 +13,15 @@ import sys.io.File;
 #end
 
 // TODO fixme
-class CPUProfileReporter implements IProfilerReporter {
-	public function new() {}
+class CPUProfileReporter extends FileBaseReporter implements IProfilerReporter {
+	public function new(?fileName:Null<String>) {
+		super(fileName, Context.definedValue("profiler-cpuprofile-reporter"), "profiler.cpuprofile");
+	}
 
 	public function startProfiler() {}
 
 	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
-		output(buildCPUProfile(root));
+		outputProfile(buildCPUProfile(root));
 	}
 
 	function buildCPUProfile(tree:HierarchyCallData):CPUProfile {
@@ -99,31 +101,7 @@ class CPUProfileReporter implements IProfilerReporter {
 
 	public function exitFunction(data:CallData) {}
 
-	function output(root:CPUProfile) {
-		var text:String = Json.stringify(root, "    ");
-		#if (sys || nodejs)
-		File.saveContent(getCpuProfileFileName(), text);
-		#elseif js
-		js.Browser.console.log(text);
-		#else
-		trace(text);
-		#end
+	function outputProfile(root:CPUProfile) {
+		output(Json.stringify(root, "    "));
 	}
-
-	#if (sys || nodejs)
-	public static function getCpuProfileFileName():String {
-		var fileName:String = Compiler.getDefine("profiler-cpuprofile-file");
-		if ((fileName == null) || (fileName.length <= 0) || (fileName == "1")) {
-			fileName = "Profiler.cpuprofile";
-		}
-		fileName = Path.join([Instrumentation.baseFolder(), fileName]);
-		var folder:String = Path.directory(fileName);
-		if (folder.trim().length > 0) {
-			if (!FileSystem.exists(folder)) {
-				FileSystem.createDirectory(folder);
-			}
-		}
-		return fileName;
-	}
-	#end
 }

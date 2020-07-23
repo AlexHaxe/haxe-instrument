@@ -1,12 +1,7 @@
 package instrument.coverage.reporter;
-
-import haxe.io.Path;
 import haxe.macro.Compiler;
-#if (sys || nodejs)
-import sys.FileSystem;
-#end
 
-class CodecovCoverageReporter extends CoverageFileBaseReporter implements ICoverageReporter {
+class CodecovCoverageReporter extends FileBaseReporter implements ICoverageReporter {
 	public function new(?fileName:Null<String>) {
 		super(fileName, Compiler.getDefine("coverage-codecov-reporter"), "codecov.json");
 	}

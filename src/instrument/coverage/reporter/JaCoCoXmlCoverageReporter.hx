@@ -2,9 +2,7 @@ package instrument.coverage.reporter;
 
 import haxe.macro.Compiler;
 
-#if (sys || nodejs)
-#end
-class JaCoCoXmlCoverageReporter extends CoverageFileBaseReporter implements ICoverageReporter {
+class JaCoCoXmlCoverageReporter extends FileBaseReporter implements ICoverageReporter {
 	public function new(?fileName:Null<String>) {
 		super(fileName, Compiler.getDefine("coverage-jacocoxml-reporter"), "jacoco-coverage.xml");
 	}

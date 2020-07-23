@@ -1,7 +1,7 @@
 package instrument.profiler.reporter;
 
 import haxe.io.Path;
-import haxe.macro.Compiler;
+import haxe.macro.Context;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
 import instrument.profiler.summary.HierarchyCallData;
@@ -10,8 +10,10 @@ import sys.FileSystem;
 import sys.io.File;
 #end
 
-class CSVSummaryReporter implements IProfilerReporter {
-	public function new() {}
+class CSVSummaryReporter extends FileBaseReporter implements IProfilerReporter {
+	public function new(?fileName:Null<String>) {
+		super(fileName, Context.definedValue("profiler-csv-reporter"), "profiler.csv");
+	}
 
 	public function startProfiler() {}
 
@@ -22,7 +24,7 @@ class CSVSummaryReporter implements IProfilerReporter {
 		for (data in summary) {
 			lines.push('thread-${data.threadId};${data.count};${data.duration * 1000};${data.className};${data.functionName};${data.location}');
 		}
-		output(lines);
+		outputLines(lines);
 	}
 
 	function sortSummary(a:CallSummaryData, b:CallSummaryData):Int {
@@ -45,31 +47,7 @@ class CSVSummaryReporter implements IProfilerReporter {
 
 	public function exitFunction(data:CallData) {}
 
-	function output(lines:Array<String>) {
-		var text:String = lines.join("\n");
-		#if (sys || nodejs)
-		File.saveContent(getCsvFileName(), text);
-		#elseif js
-		js.Browser.console.log(text);
-		#else
-		trace(text);
-		#end
+	function outputLines(lines:Array<String>) {
+		output(lines.join("\n"));
 	}
-
-	#if (sys || nodejs)
-	public static function getCsvFileName():String {
-		var fileName:String = Compiler.getDefine("profiler-csv-file");
-		if ((fileName == null) || (fileName.length <= 0) || (fileName == "1")) {
-			fileName = "summary.xml";
-		}
-		fileName = Path.join([Instrumentation.baseFolder(), fileName]);
-		var folder:String = Path.directory(fileName);
-		if (folder.trim().length > 0) {
-			if (!FileSystem.exists(folder)) {
-				FileSystem.createDirectory(folder);
-			}
-		}
-		return fileName;
-	}
-	#end
 }

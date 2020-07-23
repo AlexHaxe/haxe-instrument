@@ -1,5 +1,7 @@
 package instrument;
 
+import haxe.io.Path;
+import sys.FileSystem;
 #if macro
 import haxe.display.Position.Location;
 import haxe.macro.Compiler;
@@ -895,4 +897,17 @@ class Instrumentation {
 				instrument.coverage.Coverage.endCoverage();
 		}
 	}
+
+	#if (sys || nodejs)
+	public static function getFileName(name:String):String {
+		var filePath:String = Path.join([baseFolder(), name]);
+		var folder:String = Path.directory(filePath);
+		if (folder.trim().length > 0) {
+			if (!FileSystem.exists(folder)) {
+				FileSystem.createDirectory(folder);
+			}
+		}
+		return filePath;
+	}
+	#end
 }

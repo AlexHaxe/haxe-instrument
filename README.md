@@ -172,27 +172,25 @@ srcDemo/demo/Hello.hx:4: Hello.main 1 1.59811973571777344ms
 
 ### CSV profiling reporter
 
-writes profiling data to a CSV file using `thread;invocations;total time in ms;class;function;location` columns. filename defaults to `summary.csv` in your workspace root, you can use `profiler-csv-file` define to set a different name and folder. csv reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
+writes profiling data to a CSV file using `thread;invocations;total time in ms;class;function;location` columns. filename defaults to `summary.csv` in your workspace root. you can set a different name and folder. csv reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 
 ```hxml
--D profiler-csv-file=summary.xml
--D profiler-csv-reporter
+-D profiler-csv-reporter or -D profiler-csv-reporter=summary.xml
 ```
 
 ### D3 Flamegraph profiling reporter
 
-writes a json file compatible with d3-flame-graph javascript library.f ilename defaults to `flame.json` in your workspace root, you can use `profiler-d3-file` define to set a different name and folder. csv reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
+writes a json file compatible with d3-flame-graph javascript library.f ilename defaults to `flame.json` in your workspace root. you can set a different name and folder. d3 reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 
 ```hxml
--D profiler-d3-file=flame.json
--D profiler-d3-reporter
+-D profiler-d3-reporter or -D profiler-d3-reporter=flame.json
 ```
 
 ### .cpuprofile profiling reporter (WIP)
 
 work in progress - supposed to write a file in .cpuprofile format to be used in e.g. `vscode-js-profile-flame` VSCode extension.
 
-`-D profiler-cpuprofile-reporter`
+`-D profiler-cpuprofile-reporter=profiler.cpuprofile`
 
 ## end instrumentation detection
 
