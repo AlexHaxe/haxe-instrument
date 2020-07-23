@@ -8,6 +8,12 @@ class ConsoleMissingCoverageReporter implements ICoverageReporter {
 	public function generateReport(context:CoverageContext) {
 		reportUncoveredTypes(context);
 		outputLines.sort(sortOutput);
+		if (outputLines.length > 0) {
+			output("");
+			output("======================");
+			output("== missing coverage ==");
+			output("======================");
+		}
 		for (o in outputLines) {
 			output('${o.file}:${o.lineNumber}: ${o.text}');
 		}

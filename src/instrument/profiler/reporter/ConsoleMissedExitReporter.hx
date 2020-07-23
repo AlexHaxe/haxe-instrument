@@ -21,9 +21,10 @@ class ConsoleMissedExitReporter implements IProfilerReporter {
 		if (count <= 0) {
 			return;
 		}
-		output("------------------------");
-		output("-- missing exit calls --");
-		output("------------------------");
+		output("");
+		output("========================");
+		output("== missing exit calls ==");
+		output("========================");
 		for (data in pendingCalls) {
 			output("[" + data.id + "] " + data.location + ": " + data.className + "." + data.functionName);
 		}

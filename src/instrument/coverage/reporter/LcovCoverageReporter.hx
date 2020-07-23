@@ -12,7 +12,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 
 	public function generateReport(context:CoverageContext) {
 		#if (sys || nodejs)
-		sys.io.File.saveContent(Instrumentation.getFileName(fileName), "\n");
+		sys.io.File.saveContent(Instrumentation.workspaceFileName(fileName), "\n");
 		#end
 
 		var fileTypeMap:Map<String, Array<TypeInfo>> = new Map<String, Array<TypeInfo>>();
@@ -178,7 +178,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		#if nodejs
 		js.node.Fs.appendFileSync(Instrumentation.getFileName(fileName), text);
 		#elseif sys
-		var file:FileOutput = sys.io.File.append(Instrumentation.getFileName(fileName));
+		var file:FileOutput = sys.io.File.append(Instrumentation.workspaceFileName(fileName));
 		file.writeString(text.toString());
 		file.close();
 		#end

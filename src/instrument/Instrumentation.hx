@@ -881,7 +881,7 @@ class Instrumentation {
 	}
 	#end
 
-	macro public static function baseFolder():ExprOf<String> {
+	macro public static function workspaceFolder():ExprOf<String> {
 		return macro $v{Sys.getCwd()};
 	}
 
@@ -899,8 +899,8 @@ class Instrumentation {
 	}
 
 	#if (sys || nodejs)
-	public static function getFileName(name:String):String {
-		var filePath:String = Path.join([baseFolder(), name]);
+	public static function workspaceFileName(name:String):String {
+		var filePath:String = Path.join([workspaceFolder(), name]);
 		var folder:String = Path.directory(filePath);
 		if (folder.trim().length > 0) {
 			if (!FileSystem.exists(folder)) {

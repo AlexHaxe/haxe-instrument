@@ -10,9 +10,10 @@ class ConsoleSummaryReporter implements IProfilerReporter {
 	public function startProfiler() {}
 
 	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
-		output("------------------");
-		output("-- Call Summary --");
-		output("------------------");
+		output("");
+		output("==================");
+		output("== Call Summary ==");
+		output("==================");
 		summary.sort(sortSummary);
 		for (data in summary) {
 			output(data.location + ": " + data.className + "." + data.functionName + " " + data.count + " " + data.duration * 1000 + "ms");

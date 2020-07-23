@@ -18,7 +18,7 @@ class FileBaseReporter {
 
 	function output(text:String) {
 		#if (sys || nodejs)
-		sys.io.File.saveContent(Instrumentation.getFileName(fileName), text);
+		sys.io.File.saveContent(Instrumentation.workspaceFileName(fileName), text);
 		#elseif js
 		js.Browser.console.log(text);
 		#else

@@ -10,9 +10,10 @@ class ConsoleHierarchyReporter implements IProfilerReporter {
 	public function startProfiler() {}
 
 	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
-		output("--------------------");
-		output("-- Call Hierarchy --");
-		output("--------------------");
+		output("");
+		output("====================");
+		output("== Call Hierarchy ==");
+		output("====================");
 		printTree(root, "");
 	}
 
