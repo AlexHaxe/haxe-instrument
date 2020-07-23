@@ -12,3 +12,6 @@ coverage.xml
 *.cpuprofile
 coverage.json
 tests/.missing-data.json
+jacoco-coverage.xml
+emma-coverage.xml
+codecov.json

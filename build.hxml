@@ -20,7 +20,8 @@
 # -D coverage-console-missing-reporter
 -D coverage-lcov-reporter
 -D coverage-codecov-reporter
-# -D coverage-emma-reporter
+-D coverage-jacocoxml-reporter
+-D coverage-emma-reporter
 
 # -D debug-instrumentation
 # -D debug-log-expression

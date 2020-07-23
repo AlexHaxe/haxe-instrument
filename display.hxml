@@ -22,6 +22,7 @@
 -D coverage-lcov-reporter
 -D coverage-codecov-reporter
 -D coverage-emma-reporter
+-D coverage-jacocoxml-reporter
 
 --run demo.MyTestApp
 demo.MyTestApp

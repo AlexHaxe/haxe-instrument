@@ -71,32 +71,38 @@ MyTestApp.hx  |   100%   2/2 | 94.11%   16/17 | 80.95%   34/42 | 95.04%   96/101
 
 ### lcov coverage reporter
 
-writes coverage data using lcov format to a file. filename defaults to `lcov.info` in your workspace root, you can use `coverage-lcov-file` define to set a different name and folder. lcov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
+writes coverage data using lcov format to a file. filename defaults to `lcov.info` in your workspace root. you can set a different name and folder. lcov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 includes full coverage data down to lines and branches (visualisation of partially covered branches might depend on your tooling, some may show it, some won't).
 
 ```hxml
--D coverage-lcov-reporter
--D coverage-lcov-file=lcov.info
+-D coverage-lcov-reporter or -D coverage-lcov-reporter=lcov.info
 ```
 
 ### Codecov coverage reporter
 
-writes coverage data using Codecov's Json coverage foramt. filename defaults to `coverage.json` in your workspace root, you can use `coverage-codecov-file` define to set a different name and folder. lcov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
+writes coverage data using Codecov's Json coverage foramt. filename defaults to `codecov.json` in your workspace root. you can set a different name and folder. Codecov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 includes line coverage for each file, partial branches show up as "1/2" or "3/4".
 
 ```hxml
--D coverage-codecov-reporter
--D coverage-codecov-file=coverage.json
+-D coverage-codecov-reporter or -D coverage-codecov-reporter=codecov.json
 ```
 
 ### emma coverage reporter (untested)
 
-writes coverage data using emma xml format to a file. filename defaults to `coverage.xml` in your workspace root, you can use `coverage-emma-file` define to set a different name and folder. emma reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
+writes coverage data using emma xml format to a file. filename defaults to `emma-coverage.xml` in your workspace root. you can set a different name and folder. emma reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 only supports coverage down to method level (no branch and line coverage)
 
 ```hxml
--D coverage-emma-reporter
--D coverage-emma-file=coverage.xml
+-D coverage-emma-reporter or -D coverage-emma-reporter=emma-coverage.xml
+```
+
+### JaCoCo Xml coverage reporter (untested)
+
+writes coverage data using JaCoCo xml format to a file. filename defaults to `jacoco-coverage.xml` in your workspace root. you can set a different name and folder. JaCoCo reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
+includes line coverage for each file.
+
+```hxml
+-D coverage-jacocoxml-reporter or -D coverage-jacocoxml-reporter=jacoco-coverage.xml
 ```
 
 ## Profiling

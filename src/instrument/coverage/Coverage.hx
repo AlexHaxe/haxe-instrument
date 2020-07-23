@@ -51,6 +51,10 @@ class Coverage {
 		reporters.push(new instrument.coverage.reporter.EMMACoverageReporter());
 		#end
 
+		#if coverage_jacocoxml_reporter
+		reporters.push(new instrument.coverage.reporter.JaCoCoXmlCoverageReporter());
+		#end
+
 		endCustomCoverage(reporters);
 	}
 }

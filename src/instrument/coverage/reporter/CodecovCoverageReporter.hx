@@ -6,8 +6,10 @@ import haxe.macro.Compiler;
 import sys.FileSystem;
 #end
 
-class CodecovCoverageReporter implements ICoverageReporter {
-	public function new() {}
+class CodecovCoverageReporter extends CoverageFileBaseReporter implements ICoverageReporter {
+	public function new(?fileName:Null<String>) {
+		super(fileName, Compiler.getDefine("coverage-codecov-reporter"), "codecov.json");
+	}
 
 	public function generateReport(context:CoverageContext) {
 		var text:StringBuf = new StringBuf();
@@ -62,31 +64,4 @@ class CodecovCoverageReporter implements ICoverageReporter {
 		}
 		return coverage;
 	}
-
-	function output(text:String) {
-		#if (sys || nodejs)
-		sys.io.File.saveContent(getCodecovFileName(), text);
-		#elseif js
-		js.Browser.console.log(text);
-		#else
-		trace(text);
-		#end
-	}
-
-	#if (sys || nodejs)
-	public static function getCodecovFileName():String {
-		var fileName:String = Compiler.getDefine("coverage-codecov-file");
-		if ((fileName == null) || (fileName.length <= 0) || (fileName == "1")) {
-			fileName = "coverage.json";
-		}
-		fileName = Path.join([Instrumentation.baseFolder(), fileName]);
-		var folder:String = Path.directory(fileName);
-		if (folder.trim().length > 0) {
-			if (!FileSystem.exists(folder)) {
-				FileSystem.createDirectory(folder);
-			}
-		}
-		return fileName;
-	}
-	#end
 }

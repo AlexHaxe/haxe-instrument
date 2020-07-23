@@ -7,12 +7,14 @@ import sys.FileSystem;
 import sys.io.FileOutput;
 #end
 
-class LcovCoverageReporter implements ICoverageReporter {
-	public function new() {}
+class LcovCoverageReporter extends CoverageFileBaseReporter implements ICoverageReporter {
+	public function new(?fileName:Null<String>) {
+		super(fileName, Compiler.getDefine("coverage-lcov-reporter"), "lcov.info");
+	}
 
 	public function generateReport(context:CoverageContext) {
 		#if (sys || nodejs)
-		sys.io.File.saveContent(getLcovFileName(), "\n");
+		sys.io.File.saveContent(CoverageFileBaseReporter.getCoverageFileName(fileName), "\n");
 		#end
 
 		var fileTypeMap:Map<String, Array<TypeInfo>> = new Map<String, Array<TypeInfo>>();
@@ -176,9 +178,9 @@ class LcovCoverageReporter implements ICoverageReporter {
 
 	function appendCoverageFile(text:String) {
 		#if nodejs
-		js.node.Fs.appendFileSync(getLcovFileName(), text);
+		js.node.Fs.appendFileSync(CoverageFileBaseReporter.getCoverageFileName(fileName), text);
 		#elseif sys
-		var file:FileOutput = sys.io.File.append(getLcovFileName());
+		var file:FileOutput = sys.io.File.append(CoverageFileBaseReporter.getCoverageFileName(fileName));
 		file.writeString(text.toString());
 		file.close();
 		#end
@@ -188,7 +190,7 @@ class LcovCoverageReporter implements ICoverageReporter {
 		return '$key:$value\n';
 	}
 
-	function output(text:String) {
+	override function output(text:String) {
 		#if (sys || nodejs)
 		appendCoverageFile(text);
 		#elseif js
@@ -197,21 +199,4 @@ class LcovCoverageReporter implements ICoverageReporter {
 		trace(text);
 		#end
 	}
-
-	#if (sys || nodejs)
-	public static function getLcovFileName():String {
-		var fileName:String = Compiler.getDefine("coverage-lcov-file");
-		if ((fileName == null) || (fileName.length <= 0) || (fileName == "1")) {
-			fileName = "lcov.info";
-		}
-		fileName = Path.join([Instrumentation.baseFolder(), fileName]);
-		var folder:String = Path.directory(fileName);
-		if (folder.trim().length > 0) {
-			if (!FileSystem.exists(folder)) {
-				FileSystem.createDirectory(folder);
-			}
-		}
-		return fileName;
-	}
-	#end
 }
