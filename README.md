@@ -21,6 +21,8 @@ requires Haxe 4.1.x or higher
 coverage instrumentation runs independently of a test framework. so you can create a coverage report from a "normal" run of your code if you like.  
 confirmed to work with utest and munit.
 
+coverage uses a resource named `coverageTypeInfo` to store type information it collects during compiletime so it's available for runtime coverage report generation.
+
 ### console coverage reporters
 
 `-D coverage-console-summary-reporter` - prints a summary of coverage stats to your console
@@ -243,6 +245,8 @@ instrument.coverage.Coverage.endCoverage(); // when measuring coverage
 instrument.profiler.Profiler.endProfiler(); // when profiling
 #end
 ```
+
+you can invoke end instrumentation functions multiple times, results should include all data since start of application up to your end instrumentation call. file based reporters will overwrite their files with latest results.
 
 ## exclude types from instrumentation
 
