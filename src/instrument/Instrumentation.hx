@@ -20,6 +20,7 @@ using haxe.macro.ExprTools;
 using instrument.InstrumentationType;
 #end
 
+@:ignoreProfiler
 class Instrumentation {
 	static inline final AFTER = "after ";
 	static inline final BEFORE = "before ";
@@ -112,12 +113,6 @@ class Instrumentation {
 	}
 
 	static function filterType(pack:String, location:Location):InstrumentationType {
-		if ((pack.startsWith("instrument.profiler.Profiler"))
-			|| (pack.startsWith("instrument.coverage.CoverageContext"))
-			|| (pack.startsWith("instrument.dummy"))
-			|| (pack.startsWith("instrument.coverage.CoverageTypes"))) {
-			return None;
-		}
 		var excludedProfiling:Bool = false;
 		var excludedCoverage:Bool = false;
 		for (excl in excludePackProfiling) {

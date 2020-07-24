@@ -1,5 +1,6 @@
 package instrument.dummy;
 
+@:ignoreInstrument
 class DummyMutex {
 	public function new() {}
 

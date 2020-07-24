@@ -3,6 +3,7 @@ package instrument.coverage;
 import haxe.Json;
 import instrument.coverage.TypeInfo.TypeInfoStruct;
 
+@:ignoreCoverage
 class CoverageContext {
 	static var lock:Null<Mutex> = null;
 	static var id:Int = 0;

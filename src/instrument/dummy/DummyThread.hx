@@ -1,5 +1,6 @@
 package instrument.dummy;
 
+@:ignoreInstrument
 class DummyThread {
 	static var INSTANCE:DummyThread = new DummyThread();
 

@@ -9,6 +9,7 @@ import instrument.profiler.summary.HierarchicalSummary;
 import instrument.profiler.summary.HierarchyCallData;
 import instrument.profiler.summary.ThreadSummaryContext;
 
+@:ignoreProfiler
 @:expose
 class Profiler {
 	static var profilerId:Null<Int>;
