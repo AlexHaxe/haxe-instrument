@@ -4,6 +4,7 @@ dump/**
 .unittest/**
 profiler/**
 site/
+node_modules/
 run.js
 run.jar
 run.n
@@ -16,3 +17,4 @@ tests/.missing-data.json
 jacoco-coverage.xml
 emma-coverage.xml
 codecov.json
+*.zip
