@@ -28,14 +28,16 @@ class MyTestApp {
 		var sortCols = ["xxx"];
 
 		var role:Role = RoleAdmin;
+
 		switch (role) {
 			case RoleAdmin:
 				trace("admin");
 			case RoleEditor:
+				trace("editor");
 			case RoleSales:
-				trace("");
+				trace("sales");
 			case RoleCustomer:
-				trace("");
+				trace("customer");
 		}
 
 		var orderBy:String = sortCols.map(function(value:String):String {

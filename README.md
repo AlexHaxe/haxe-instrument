@@ -35,11 +35,11 @@ packages                 1/1   (100%)
 types                    2/4    (50%)
 fields                 16/18 (88.88%)
 branches               35/46 (76.08%)
-expressions          100/108 (92.59%)
+expressions          100/109 (91.74%)
 files                    1/2    (50%)
-lines                 84/102 (82.35%)
+lines                 87/103 (84.46%)
 =====================================
-Overall:                      87.79%
+Overall:                      87.28%
 =====================================
 ```
 
@@ -52,9 +52,9 @@ overall coverage is `(covered fields + covered branches + covered expressions) /
             | Files        | Types        | Fields         | Branches       | Expression       | Lines           | Overall
 Package     | Rate     Num | Rate     Num | Rate       Num | Rate       Num | Rate         Num | Rate        Num |
 ==========================================================================================================================
-demo        |    50%   1/2 |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 92.59%   100/108 | 82.35%   84/102 |  87.79%
+demo        |    50%   1/2 |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 91.74%   100/109 | 84.46%   87/103 |  87.28%
 ==========================================================================================================================
-     Total: |    50%   1/2 |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 92.59%   100/108 | 82.35%   84/102 |  87.79%
+     Total: |    50%   1/2 |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 91.74%   100/109 | 84.46%   87/103 |  87.28%
 ==========================================================================================================================
 ```
 
@@ -67,13 +67,42 @@ FileName      | Rate     Num | Rate       Num | Rate       Num | Rate         Nu
 =============================================================================================================
 [srcDemo/demo/]
 Hello.hx      |     0%   0/1 |     0%     0/1 |     0%     0/0 |     0%       0/1 |     0%      0/1 |      0%
-MyTestApp.hx  | 66.66%   2/3 | 94.11%   16/17 | 76.08%   35/46 | 93.45%   100/107 | 83.16%   84/101 |  88.82%
+MyTestApp.hx  | 66.66%   2/3 | 94.11%   16/17 | 76.08%   35/46 | 92.59%   100/108 | 85.29%   87/102 |   88.3%
 =============================================================================================================
-       Total: |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 92.59%   100/108 | 82.35%   84/102 |  87.79%
+       Total: |    50%   2/4 | 88.88%   16/18 | 76.08%   35/46 | 91.74%   100/109 | 84.46%   87/103 |  87.28%
 =============================================================================================================
 ```
 
 `-D coverage-console-missing-reporter` - prints a line for every type, field, branch and expression with no coverage
+
+```text
+======================
+== missing coverage ==
+======================
+srcDemo/demo/Hello.hx:3: type Hello not covered
+srcDemo/demo/Hello.hx:4: field main not covered
+srcDemo/demo/Hello.hx:5: expression not covered
+srcDemo/demo/MyTestApp.hx:35: branch not covered
+srcDemo/demo/MyTestApp.hx:36: expression not covered
+srcDemo/demo/MyTestApp.hx:37: branch not covered
+srcDemo/demo/MyTestApp.hx:38: expression not covered
+srcDemo/demo/MyTestApp.hx:39: branch not covered
+srcDemo/demo/MyTestApp.hx:40: expression not covered
+srcDemo/demo/MyTestApp.hx:53: branch not covered
+srcDemo/demo/MyTestApp.hx:54: expression not covered
+srcDemo/demo/MyTestApp.hx:59: branch not covered
+srcDemo/demo/MyTestApp.hx:60: expression not covered
+srcDemo/demo/MyTestApp.hx:65: branch not covered
+srcDemo/demo/MyTestApp.hx:66: expression not covered
+srcDemo/demo/MyTestApp.hx:68: branch not covered
+srcDemo/demo/MyTestApp.hx:74: branch not covered
+srcDemo/demo/MyTestApp.hx:131: branch not covered
+srcDemo/demo/MyTestApp.hx:134: expression not covered
+srcDemo/demo/MyTestApp.hx:138: branch not covered
+srcDemo/demo/MyTestApp.hx:151: field download not covered
+srcDemo/demo/MyTestApp.hx:152: expression not covered
+srcDemo/demo/MyTestApp.hx:154: type Role not covered
+```
 
 ### lcov coverage reporter
 
@@ -140,41 +169,31 @@ srcDemo/demo/Hello.hx:5: Hello Haxe
 `-D profiler-console-detail-reporter` - prints entry and exit of every function as it happens including call id, location type and function name and duration of call
 
 ```text
-------------------
--- Call Summary --
-------------------
-srcDemo/demo/Hello.hx:4: Hello.main 1 1.59811973571777344ms
+==================
+== Call Summary ==
+==================
+srcDemo/demo/MyTestApp.hx:143: MyTestApp.main 1 3.10015678405761719ms
+srcDemo/demo/MyTestApp.hx:6: MyTestApp.new 1 1.54900550842285156ms
+srcDemo/demo/MyTestApp.hx:117: MyTestApp.noBody4 1 0.174999237060546875ms
+srcDemo/demo/MyTestApp.hx:148: MyTestApp_Fields_.moduleBody 7 0.14591217041015625ms
+srcDemo/demo/MyTestApp.hx:71: MyTestApp.opBoolOr 3 0.145196914672851562ms
+srcDemo/demo/MyTestApp.hx:89: MyTestApp.initTranslations 1 0.134944915771484375ms
+srcDemo/demo/MyTestApp.hx:102: MyTestApp.noBody3 2 0.129222869873046875ms
+srcDemo/demo/MyTestApp.hx:19: MyTestApp.<anon-1> 2 0.116825103759765625ms
+srcDemo/demo/MyTestApp.hx:82: MyTestApp.sortColsFunc 1 0.0898838043212890625ms
+srcDemo/demo/MyTestApp.hx:57: MyTestApp.switchVal 2 0.0722408294677734375ms
+srcDemo/demo/MyTestApp.hx:111: MyTestApp.noBody2 3 0.051021575927734375ms
+srcDemo/demo/MyTestApp.hx:122: MyTestApp.getInt 2 0.0469684600830078125ms
+srcDemo/demo/MyTestApp.hx:99: MyTestApp.noBody 1 0.04482269287109375ms
+srcDemo/demo/MyTestApp.hx:114: MyTestApp.noBody5 3 0.03910064697265625ms
+srcDemo/demo/MyTestApp.hx:130: MyTestApp.noCover 1 0.0278949737548828125ms
+srcDemo/demo/MyTestApp.hx:137: MyTestApp.whileLoop 1 0.0209808349609375ms
+srcDemo/demo/MyTestApp.hx:43: MyTestApp.<anon-2> 1 0.0159740447998046875ms
+srcDemo/demo/MyTestApp.hx:83: MyTestApp.<anon-3> 1 0.0140666961669921875ms
+srcDemo/demo/MyTestApp.hx:4: MyTestApp.<anon-arrow-0> 1 0.011920928955078125ms
 ```
 
 `-D profiler-console-missing-reporter` - prints a list of all calls that didn't exit properly. (might indicate an issue in instrument library)
-
-```text
-======================
-== missing coverage ==
-======================
-srcDemo/demo/Hello.hx:3: type Hello not covered
-srcDemo/demo/Hello.hx:4: field main not covered
-srcDemo/demo/Hello.hx:5: expression not covered
-srcDemo/demo/MyTestApp.hx:31: branch not covered
-srcDemo/demo/MyTestApp.hx:35: branch not covered
-srcDemo/demo/MyTestApp.hx:36: expression not covered
-srcDemo/demo/MyTestApp.hx:37: branch not covered
-srcDemo/demo/MyTestApp.hx:38: expression not covered
-srcDemo/demo/MyTestApp.hx:51: branch not covered
-srcDemo/demo/MyTestApp.hx:52: expression not covered
-srcDemo/demo/MyTestApp.hx:57: branch not covered
-srcDemo/demo/MyTestApp.hx:58: expression not covered
-srcDemo/demo/MyTestApp.hx:63: branch not covered
-srcDemo/demo/MyTestApp.hx:64: expression not covered
-srcDemo/demo/MyTestApp.hx:66: branch not covered
-srcDemo/demo/MyTestApp.hx:72: branch not covered
-srcDemo/demo/MyTestApp.hx:129: branch not covered
-srcDemo/demo/MyTestApp.hx:132: expression not covered
-srcDemo/demo/MyTestApp.hx:136: branch not covered
-srcDemo/demo/MyTestApp.hx:149: field download not covered
-srcDemo/demo/MyTestApp.hx:150: expression not covered
-srcDemo/demo/MyTestApp.hx:152: type Role not covered
-```
 
 `-D profiler-console-hierarchy-reporter` - prints a hierachical summary of calls showing which function was called from what function, again listing all locations, fields, number opf invocations and duration
 
