@@ -3,11 +3,12 @@ dump/**
 .svn/**
 .unittest/**
 profiler/**
+site/
 run.js
 run.jar
 run.n
 flame.json
-lcov.info
+lcov*.info
 coverage.xml
 *.cpuprofile
 coverage.json
