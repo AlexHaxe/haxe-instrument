@@ -1,3 +1,7 @@
+[![Haxe-Instrument](https://github.com/AlexHaxe/haxe-instrument/workflows/Haxe-Instrument/badge.svg)](https://github.com/AlexHaxe/haxe-instrument/actions)
+[![codecov](https://codecov.io/gh/AlexHaxe/haxe-instrument/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexHaxe/haxe-instrument)
+
+
 # Coverage and Profiling instrumentation library
 
 profiling and coverage will instrument your code to include calls to profile and coverage data collector logic.  
