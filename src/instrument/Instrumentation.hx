@@ -595,16 +595,21 @@ class Instrumentation {
 
 	static function ensureBlockExpr(expr:Expr):Expr {
 		return switch (expr.expr) {
-			case EBlock(_): expr;
-			default: makeBlock(expr);
+			case EBlock(_):
+				expr;
+			default:
+				makeBlock(expr);
 		}
 	}
 
 	static function ensureBlockValueExpr(expr:Expr):Expr {
 		return switch (expr.expr) {
-			case EBlock([]): makeBlock(expr); // this is not an "empty block", it's a empty object declaration.
-			case EBlock(_): expr;
-			default: makeBlock(expr);
+			case EBlock([]):
+				makeBlock(expr); // this is not an "empty block", it's a empty object declaration.
+			case EBlock(_):
+				expr;
+			default:
+				makeBlock(expr);
 		}
 	}
 
@@ -896,7 +901,7 @@ class Instrumentation {
 	public static function workspaceFileName(name:String):String {
 		var filePath:String = Path.join([workspaceFolder(), name]);
 		var folder:String = Path.directory(filePath);
-		if (folder.trim().length > 0) {
+		if (folder.length > 0) {
 			if (!FileSystem.exists(folder)) {
 				FileSystem.createDirectory(folder);
 			}

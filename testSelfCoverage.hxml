@@ -2,6 +2,8 @@
 -cp srcDemo
 -cp tests
 
+-lib utest
+
 --macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
 --macro instrument.Instrumentation.coverage(["demo", "instrument"], ["src", "srcDemo"], ["demo"])
 -D profiler-console-detail-reporter
