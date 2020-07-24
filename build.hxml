@@ -2,7 +2,7 @@
 -cp srcDemo
 
 --macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
---macro instrument.Instrumentation.coverage(["demo"], ["src", "srcDemo"], [])
+--macro instrument.Instrumentation.coverage(["demo"], ["srcDemo"], [])
 # -D profiler-console-detail-reporter
 -D profiler-console-missing-reporter
 # -D profiler-console-summary-reporter
