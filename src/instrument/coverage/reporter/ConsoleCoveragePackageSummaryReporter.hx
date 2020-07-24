@@ -26,6 +26,7 @@ class ConsoleCoveragePackageSummaryReporter implements ICoverageReporter {
 			}
 			lines.push(summary);
 		}
+		lines.sort(sortPackageNames);
 
 		var packColumn:Int = longestPackageName(lines) + 1;
 		var fileColumn:Int = summaryColumnLen(context.files.length, context.filesCovered);
