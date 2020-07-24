@@ -29,6 +29,7 @@ class FieldInfo {
 		branches = [];
 	}
 
+	#if macro
 	public function addExpression(expression:ExpressionInfo) {
 		expressions.push(expression);
 	}
@@ -36,6 +37,7 @@ class FieldInfo {
 	public function addBranches(branchesInfo:BranchesInfo) {
 		branches.push(branchesInfo);
 	}
+	#end
 
 	public function calcStatistic(cb:GetCoverageCount) {
 		branchCount = 0;

@@ -43,5 +43,11 @@ jobs:
     - name: Run demo
       if: matrix.haxe-version == 'nightly'
       run: npx haxe build.hxml
+    - name: Run self coverage
+      if: matrix.haxe-version == 'nightly'
+      run: npx haxe testSelfCoverage.hxml
     - name: Run tests
       run: npx haxe test.hxml
+    - name: Upload results to codecov
+      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == 'nightly'
+      run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"

@@ -2,8 +2,11 @@ package instrument.coverage.reporter;
 
 class ConsoleMissingCoverageReporter implements ICoverageReporter {
 	var outputLines:Array<OutputLine> = [];
+	var lineMap:Map<String, Bool>;
 
-	public function new() {}
+	public function new() {
+		lineMap = new Map<String, Bool>();
+	}
 
 	public function generateReport(context:CoverageContext) {
 		reportUncoveredTypes(context);
@@ -20,11 +23,11 @@ class ConsoleMissingCoverageReporter implements ICoverageReporter {
 	}
 
 	function addOutput(file:String, lineNumber:Int, text:String) {
-		for (out in outputLines) {
-			if ((out.file == file) && (out.lineNumber == lineNumber) && (out.text == text)) {
-				return;
-			}
+		var line:String = '${file}:${lineNumber}: ${text}';
+		if (lineMap.exists(line)) {
+			return;
 		}
+		lineMap.set(line, true);
 		outputLines.push({file: file, lineNumber: lineNumber, text: text});
 	}
 

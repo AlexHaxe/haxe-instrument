@@ -24,9 +24,11 @@ class BranchesInfo {
 		branches = [];
 	}
 
+	#if macro
 	public function addBranch(branch:BranchInfo) {
 		branches.push(branch);
 	}
+	#end
 
 	public function calcStatistic(cb:GetCoverageCount) {
 		count = 0;

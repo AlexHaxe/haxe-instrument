@@ -31,9 +31,11 @@ class TypeInfo {
 		fields = [];
 	}
 
+	#if macro
 	public function addField(field:FieldInfo) {
 		fields.push(field);
 	}
+	#end
 
 	public function calcStatistic(cb:GetCoverageCount) {
 		fieldsCovered = 0;
