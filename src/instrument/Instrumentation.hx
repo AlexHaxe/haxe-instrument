@@ -21,7 +21,9 @@ using instrument.InstrumentationType;
 #end
 
 class Instrumentation {
-	static inline var DISPLAY = "display";
+	static inline final AFTER = "after ";
+	static inline final BEFORE = "before ";
+	static inline final DISPLAY = "display";
 
 	#if macro
 	static var includePackProfiling:Array<String> = [];
@@ -300,12 +302,12 @@ class Instrumentation {
 				initFieldContext(field);
 				context.allReturns = hasAllReturns(fun.expr);
 				#if debug_instrumentation
-				trace("before " + fun.expr.toString());
+				trace(BEFORE + fun.expr.toString());
 				#end
 				fun.expr = instrumentExpr(ensureBlockExpr(fun.expr));
 				fun.expr = instrumentFieldExpr(fun.expr, true, isMain);
 				#if debug_instrumentation
-				trace("after " + fun.expr.toString());
+				trace(AFTER + fun.expr.toString());
 				#end
 			case FVar(type, expr) if (expr != null):
 				if (context.isAbstract || context.isInline) {
@@ -313,12 +315,12 @@ class Instrumentation {
 				}
 				initFieldContext(field);
 				#if debug_instrumentation
-				trace("before " + expr.toString());
+				trace(BEFORE + expr.toString());
 				#end
 				expr = instrumentExpr(ensureBlockValueExpr(expr));
 				expr = instrumentFieldExpr(expr, false, false);
 				#if debug_instrumentation
-				trace("after " + expr.toString());
+				trace(AFTER + expr.toString());
 				#end
 				field.kind = FVar(type, expr);
 			case FProp(get, set, type, expr) if (expr != null):
@@ -327,12 +329,12 @@ class Instrumentation {
 				}
 				initFieldContext(field);
 				#if debug_instrumentation
-				trace("before " + expr.toString());
+				trace(BEFORE + expr.toString());
 				#end
 				expr = instrumentExpr(ensureBlockValueExpr(expr));
 				expr = instrumentFieldExpr(expr, false, false);
 				#if debug_instrumentation
-				trace("after " + expr.toString());
+				trace(AFTER + expr.toString());
 				#end
 				field.kind = FProp(get, set, type, expr);
 			default:
