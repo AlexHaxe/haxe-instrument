@@ -6,6 +6,7 @@ import coverage.testcases.IfBranches;
 import coverage.testcases.IgnoredCoverage;
 import coverage.testcases.MissingFields;
 import coverage.testcases.SwitchBranches;
+import coverage.testcases.TryCatch;
 import coverage.testcases.WhileBranches;
 
 class CoverageTestMain {
@@ -14,6 +15,7 @@ class CoverageTestMain {
 		IgnoredCoverage.new,
 		MissingFields.new,
 		SwitchBranches.new,
+		TryCatch.new,
 		WhileBranches.new
 	];
 

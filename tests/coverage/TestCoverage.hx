@@ -1,6 +1,7 @@
 package coverage;
 
 import haxe.Exception;
+import haxe.PosInfos;
 import utest.Assert;
 import utest.ITest;
 import coverage.testee.ExpectedCoverageData;
@@ -75,16 +76,25 @@ class TestCoverage implements ITest {
 		runTestee("coverage.testcases.WhileBranches");
 	}
 
-	function runTestee(testeeClass:String) {
+	public function testTryCatch() {
+		var data:ExpectedCoverageData = new ExpectedCoverageData();
+		data.addMissing(13, Expression);
+		data.addMissing(21, Expression);
+		data.save();
+		runTestee("coverage.testcases.TryCatch");
+	}
+
+	function runTestee(testeeClass:String, ?pos:PosInfos) {
 		var params:Array<String> = [
 			"haxe", "-cp", "src", "-cp", "tests", "-D", "test-class=" + testeeClass, "--macro",
 			'instrument.Instrumentation.coverage([\'$testeeClass\'],[\'tests\'],[])', "-main", "coverage.testee.CoverageTestMain", "--run",
 			"coverage.testee.CoverageTestMain"
 		];
 
+		Sys.println(params.join(" "));
 		try {
 			var exitCode:Int = Sys.command("npx", params);
-			Assert.equals(0, exitCode);
+			Assert.equals(0, exitCode, pos);
 		} catch (e:Exception) {
 			Assert.fail(e.details());
 		};

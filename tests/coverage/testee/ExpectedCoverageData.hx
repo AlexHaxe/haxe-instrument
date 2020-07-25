@@ -21,9 +21,13 @@ class ExpectedCoverageData {
 	}
 
 	public static function load():ExpectedCoverageData {
-		var jsonData:String = File.getContent(getMissingDataFile());
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
-		data.missedItems = Json.parse(jsonData);
+		if (FileSystem.exists(getMissingDataFile())) {
+			var jsonData:String = File.getContent(getMissingDataFile());
+			data.missedItems = Json.parse(jsonData);
+		} else {
+			data.addMissing(99999, Type("data file not loaded"));
+		}
 		return data;
 	}
 

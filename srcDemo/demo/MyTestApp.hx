@@ -1,5 +1,7 @@
 package demo;
 
+import haxe.Exception;
+
 class MyTestApp {
 	var arrow = (a) -> a + 1;
 
@@ -50,6 +52,9 @@ class MyTestApp {
 		opBoolOr(1);
 		opBoolOr(2);
 		opBoolOr(4);
+		tryMissedCatch();
+		tryCatched();
+
 		if (false)
 			Sys.exit(0);
 	}
@@ -139,6 +144,30 @@ class MyTestApp {
 			return null;
 		}
 	}
+
+	public function tryMissedCatch() {
+		try {
+			doNothing();
+		} catch (e:Exception) {
+			doNothing();
+		}
+	}
+
+	public function tryCatched() {
+		try {
+			doNothing();
+			throwSomething();
+			doNothing();
+		} catch (e:Exception) {
+			doNothing();
+		}
+	}
+
+	function throwSomething() {
+		throw "something";
+	}
+
+	function doNothing() {}
 
 	static function main() {
 		new MyTestApp(123, true);
