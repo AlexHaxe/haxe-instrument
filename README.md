@@ -1,8 +1,8 @@
+# Coverage and Profiling instrumentation library
+
 [![Haxelib Version](https://img.shields.io/github/tag/AlexHaxe/haxe-instrument.svg?label=haxelib)](http://lib.haxe.org/p/instrument)
 [![Haxe-Instrument](https://github.com/AlexHaxe/haxe-instrument/workflows/Haxe-Instrument/badge.svg)](https://github.com/AlexHaxe/haxe-instrument/actions)
 [![codecov](https://codecov.io/gh/AlexHaxe/haxe-instrument/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexHaxe/haxe-instrument)
-
-# Coverage and Profiling instrumentation library
 
 profiling and coverage will instrument your code to include calls to profile and coverage data collector logic.  
 for that purpose all inlining of included types will be disabled.
@@ -13,7 +13,7 @@ requires Haxe 4.1.x or higher
 
 ## Coverage
 
-```
+```hxml
 -lib instrument
 --macro instrument.Instrumentation.coverage([include packages], [include folders], [exclude packages])
 ```
@@ -31,7 +31,7 @@ coverage uses a resource named `coverageTypeInfo` to store type information it c
 
 `-D coverage-console-summary-reporter` - prints a summary of coverage stats to your console
 
-```
+```text
 =====================================
 Coverage summary
 =====================================
@@ -51,7 +51,7 @@ overall coverage is `(covered fields + covered branches + covered expressions) /
 
 `-D coverage-console-package-summary-reporter` - prints a package summary of coverage stats to your console
 
-```
+```text
 =========================================================================================================================================================
                               | Files          | Types          | Fields           | Branches         | Expression         | Lines              | Overall
 Package                       | Rate       Num | Rate       Num | Rate         Num | Rate         Num | Rate           Num | Rate           Num |
@@ -70,7 +70,7 @@ instrument.profiler.summary   |   100%     3/3 |   100%     3/3 | 84.21%     16/
 
 `-D coverage-console-file-summary-reporter` - prints a file by file summary of coverage stats to your console
 
-```
+```text
 ======================================================================================================================================================================
                                                             | Types          | Fields           | Branches         | Expression         | Lines              | Overall
 FileName                                                    | Rate       Num | Rate         Num | Rate         Num | Rate           Num | Rate           Num |
@@ -118,7 +118,7 @@ MyTestApp.hx                                                |     0%     0/3 |  
 
 `-D coverage-console-missing-reporter` - prints a line for every type, field, branch and expression with no coverage
 
-```
+```text
 ======================
 == missing coverage ==
 ======================
@@ -152,7 +152,7 @@ srcDemo/demo/MyTestApp.hx:154: type Role not covered
 writes coverage data using lcov format to a file. filename defaults to `lcov.info` in your workspace root. you can set a different name and folder. lcov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 includes full coverage data down to lines and branches (visualisation of partially covered branches might depend on your tooling, some may show it, some won't).
 
-```
+```hxml
 -D coverage-lcov-reporter
 -D coverage-lcov-reporter=lcov.info
 ```
@@ -162,7 +162,7 @@ includes full coverage data down to lines and branches (visualisation of partial
 writes coverage data using Codecov's Json coverage foramt. filename defaults to `codecov.json` in your workspace root. you can set a different name and folder. Codecov reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 includes line coverage for each file, partial branches show up as "1/2" or "3/4".
 
-```
+```hxml
 -D coverage-codecov-reporter
 -D coverage-codecov-reporter=codecov.json
 ```
@@ -172,7 +172,7 @@ includes line coverage for each file, partial branches show up as "1/2" or "3/4"
 writes coverage data using emma xml format to a file. filename defaults to `emma-coverage.xml` in your workspace root. you can set a different name and folder. emma reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 only supports coverage down to method level (no branch and line coverage)
 
-```
+```hxml
 -D coverage-emma-reporter
 -D coverage-emma-reporter=emma-coverage.xml
 ```
@@ -182,13 +182,13 @@ only supports coverage down to method level (no branch and line coverage)
 writes coverage data using JaCoCo xml format to a file. filename defaults to `jacoco-coverage.xml` in your workspace root. you can set a different name and folder. JaCoCo reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 includes line coverage for each file.
 
-```
+```hxml
 -D coverage-jacocoxml-reporter or -D coverage-jacocoxml-reporter=jacoco-coverage.xml
 ```
 
 ## Profiling
 
-```
+```hxml
 -lib instrument
 --macro instrument.Instrumentation.profiling([include packages], [include folders], [exclude packages])
 ```
@@ -203,7 +203,7 @@ profiling was written with multithreading in mind, but's currently untested
 
 `-D profiler-console-summary-reporter` - prints a summary listing all locations, fields, number of invocations and duration spent inside (includes duration of calls to other functions)
 
-```
+```text
 >>> [2] srcDemo/demo/Hello.hx:4: Hello.main
 srcDemo/demo/Hello.hx:5: Hello Haxe
 <<< [2] srcDemo/demo/Hello.hx:4: Hello.main 0.080108642578125ms
@@ -211,7 +211,7 @@ srcDemo/demo/Hello.hx:5: Hello Haxe
 
 `-D profiler-console-detail-reporter` - prints entry and exit of every function as it happens including call id, location type and function name and duration of call
 
-```
+```text
 ==================
 == Call Summary ==
 ==================
@@ -240,7 +240,7 @@ srcDemo/demo/MyTestApp.hx:4: MyTestApp.<anon-arrow-0> 1 0.011920928955078125ms
 
 `-D profiler-console-hierarchy-reporter` - prints a hierachical summary of calls showing which function was called from what function, again listing all locations, fields, number opf invocations and duration
 
-```
+```text
 ====================
 == Call Hierarchy ==
 ====================
@@ -274,7 +274,7 @@ srcDemo/demo/MyTestApp.hx:4: MyTestApp.<anon-arrow-0> 1 0.011920928955078125ms
 
 writes profiling data to a CSV file using `thread;invocations;total time in ms;class;function;location` columns. filename defaults to `summary.csv` in your workspace root. you can set a different name and folder. csv reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 
-```
+```hxml
 -D profiler-csv-reporter
 -D profiler-csv-reporter=summary.xml
 ```
@@ -283,7 +283,7 @@ writes profiling data to a CSV file using `thread;invocations;total time in ms;c
 
 writes a json file compatible with d3-flame-graph javascript library.f ilename defaults to `flame.json` in your workspace root. you can set a different name and folder. d3 reporter will try to create output folder. folder name is relative to your workspace root (or whereever you run Haxe from).
 
-```
+```hxml
 -D profiler-d3-reporter
 -D profiler-d3-reporter=flame.json
 ```
@@ -292,7 +292,7 @@ writes a json file compatible with d3-flame-graph javascript library.f ilename d
 
 work in progress - supposed to write a file in .cpuprofile format to be used in e.g. `vscode-js-profile-flame` VSCode extension.
 
-```
+```hxml
 -D profiler-cpuprofile-reporter
 -D profiler-cpuprofile-reporter=profiler.cpuprofile
 ```
@@ -301,7 +301,7 @@ work in progress - supposed to write a file in .cpuprofile format to be used in 
 
 instrument tries to find your `main` function and all calls to `Sys.exit` to set up automatic detection of program exit. however if you exit your program by any other means or if your main function is excluded from instrumentation, then you might have to add a call to instrument's `endProfiler` or `endCoverage` functions:
 
-```
+```hxml
 #if instrument
 instrument.coverage.Coverage.endCoverage(); // when measuring coverage
 instrument.profiler.Profiler.endProfiler(); // when profiling
