@@ -22,6 +22,8 @@ requires Haxe 4.1.x or higher
 - include folders - array of folders containing code for coverage data collection. `Compiler.include` is used to make sure your types get included
 - exclude packages - array of packages to ignore, e.g. because they are for a different target. again using `StringTools.startsWith` to match fully qualified type names against list
 
+make sure you include your source folder(s), otherwise you will only see coverage stats of types touched during run.
+
 coverage instrumentation runs independently of a test framework. so you can create a coverage report from a "normal" run of your code if you like.  
 confirmed to work with utest and munit.
 
@@ -201,7 +203,7 @@ profiling was written with multithreading in mind, but's currently untested
 
 ### console profiling reporters
 
-`-D profiler-console-summary-reporter` - prints a summary listing all locations, fields, number of invocations and duration spent inside (includes duration of calls to other functions)
+`-D profiler-console-detail-reporter` - prints entry and exit of every function as it happens including call id, location type and function name and duration of call
 
 ```text
 >>> [2] srcDemo/demo/Hello.hx:4: Hello.main
@@ -209,7 +211,7 @@ srcDemo/demo/Hello.hx:5: Hello Haxe
 <<< [2] srcDemo/demo/Hello.hx:4: Hello.main 0.080108642578125ms
 ```
 
-`-D profiler-console-detail-reporter` - prints entry and exit of every function as it happens including call id, location type and function name and duration of call
+`-D profiler-console-summary-reporter` - prints a summary listing all locations, fields, number of invocations and duration spent inside (includes duration of calls to other functions)
 
 ```text
 ==================
