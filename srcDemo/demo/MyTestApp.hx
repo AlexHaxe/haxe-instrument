@@ -171,6 +171,7 @@ class MyTestApp {
 
 	static function main() {
 		new MyTestApp(123, true);
+		ArrayTest.main();
 	}
 }
 

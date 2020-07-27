@@ -214,22 +214,16 @@ class Instrumentation {
 				if (type.name == null || type.isExtern || type.isInterface) {
 					return null;
 				}
+				packParts = type.pack;
+				name = type.name;
+				module = type.module;
+				pos = type.pos;
+				isPrivate = type.isPrivate;
+				meta = type.meta;
 				switch (type.kind) {
-					case KAbstractImpl(_.get() => abstractType):
-						packParts = abstractType.pack;
-						name = abstractType.name;
-						module = abstractType.module;
-						pos = abstractType.pos;
-						isPrivate = abstractType.isPrivate;
+					case KAbstractImpl(ref):
 						isAbstract = true;
-						meta = abstractType.meta;
 					default:
-						packParts = type.pack;
-						name = type.name;
-						module = type.module;
-						pos = type.pos;
-						isPrivate = type.isPrivate;
-						meta = type.meta;
 				}
 			default:
 				return null;
