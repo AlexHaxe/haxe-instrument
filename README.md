@@ -312,10 +312,10 @@ instrument.profiler.Profiler.endProfiler(); // when profiling
 
 you can invoke end instrumentation functions multiple times, results should include all data since start of application up to your end instrumentation call. file based reporters will overwrite their files with latest results.
 
-## exclude types from instrumentation
+## exclude types  or fields from instrumentation
 
-you can exclude types from instrumentation by adding metadata to a type:
+you can exclude types / fields from instrumentation by adding metadata:
 
-- `@ignoreInstrument` or `@:ignoreInstrument` will ignore a type from all instrumentation
-- `@ignoreCoverage` or `@:ignoreCoverage` will ignore a type from coverage instrumentation
-- `@ignoreProfiler` or `@:ignoreProfiler` will ignore a type from profiler instrumentation
+- `@ignoreInstrument` or `@:ignoreInstrument` will ignore a type / field from all instrumentation
+- `@ignoreCoverage` or `@:ignoreCoverage` will ignore a type / field  from coverage instrumentation
+- `@ignoreProfiler` or `@:ignoreProfiler` will ignore a type / field  from profiler instrumentation

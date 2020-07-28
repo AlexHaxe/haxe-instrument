@@ -185,14 +185,25 @@ class Instrumentation {
 	}
 
 	static function filterTypeMeta(meta:MetaAccess, type:InstrumentationType):InstrumentationType {
-		if (meta.has("ignoreInstrument") || meta.has(":ignoreInstrument") || meta.has("ignoreInstrumentation") || meta.has(":ignoreInstrumentation")) {
-			return None;
+		return filterFieldMeta(meta.get(), type);
+	}
+
+	static function filterFieldMeta(metadata:Null<Metadata>, type:InstrumentationType):InstrumentationType {
+		if (metadata == null) {
+			return type;
 		}
-		if (meta.has("ignoreCoverage") || meta.has(":ignoreCoverage")) {
-			type = type.remove(Coverage);
-		}
-		if (meta.has("ignoreProfiler") || meta.has(":ignoreProfiler")) {
-			type = type.remove(Profiling);
+		for (meta in metadata) {
+			switch (meta.name) {
+				case "ignoreInstrument" | ":ignoreInstrument" | "ignoreInstrumentation" | ":ignoreInstrumentation":
+					return None;
+				case "ignoreCoverage" | ":ignoreCoverage":
+					type = type.remove(Coverage);
+				case "ignoreProfiler" | ":ignoreProfiler":
+					type = type.remove(Profiling);
+			}
+			if (type == None) {
+				return None;
+			}
 		}
 		return type;
 	}
@@ -202,76 +213,78 @@ class Instrumentation {
 			return null;
 		}
 
-		var packParts:Array<String>;
-		var name:String;
-		var module:String;
-		var pos:Position;
-		var isPrivate:Bool;
-		var isAbstract:Bool = false;
-		var meta:MetaAccess;
 		switch (Context.getLocalType()) {
 			case TInst(_.get() => type, _):
 				if (type.name == null || type.isExtern || type.isInterface) {
 					return null;
 				}
-				packParts = type.pack;
-				name = type.name;
-				module = type.module;
-				pos = type.pos;
-				isPrivate = type.isPrivate;
-				meta = type.meta;
+				context = makeInstrumentContext(type);
 				switch (type.kind) {
 					case KAbstractImpl(ref):
-						isAbstract = true;
+						context.isAbstract = true;
 					default:
 				}
 			default:
 				return null;
 		}
 
-		if (isPrivate) {
+		switch (context.level) {
+			case None:
+				return null;
+			case Coverage | Profiling | Both:
+		}
+		Sys.print(".");
+
+		var fields:Array<Field> = Context.getBuildFields();
+		var typeLevel:InstrumentationType = context.level;
+		for (field in fields) {
+			context.level = filterFieldMeta(field.meta, typeLevel);
+			switch (context.level) {
+				case None:
+					continue;
+				case Coverage | Profiling | Both:
+			}
+			instrumentField(field);
+		}
+		return fields;
+	}
+
+	static function makeInstrumentContext(type:ClassType):InstrumentationContext {
+		var packParts:Array<String> = type.pack.copy();
+		if (type.isPrivate) {
 			packParts.pop();
 		}
 		var pack:String = packParts.join(".");
 
 		var fullTypeName:String = if (packParts.length <= 0) {
-			name;
+			type.name;
 		} else {
-			pack + '.${name}';
+			pack + '.${type.name}';
 		};
 
-		var location:Location = PositionTools.toLocation(pos);
-		var currentLevel:InstrumentationType = filterType(fullTypeName, location);
-		currentLevel = filterTypeMeta(meta, currentLevel);
-		switch (currentLevel) {
-			case None:
-				return null;
-			case Coverage:
-			case Profiling:
-			case Both:
-		}
-		Sys.print(".");
+		var location:Location = PositionTools.toLocation(type.pos);
+		var typeLevel:InstrumentationType = filterType(fullTypeName, location);
+		typeLevel = filterTypeMeta(type.meta, typeLevel);
 
-		var typeInfo:TypeInfo = new TypeInfo(coverageContext.nextId(), pack, name, location.locationToString(), location.file.toString(),
+		var typeInfo:TypeInfo = new TypeInfo(coverageContext.nextId(), pack, type.name, location.locationToString(), location.file.toString(),
 			location.range.start.line, location.range.end.line);
-		coverageContext.addType(typeInfo);
-		context = {
+		switch (typeLevel) {
+			case None | Profiling:
+			case Coverage | Both:
+				coverageContext.addType(typeInfo);
+		}
+		return {
 			pack: pack,
-			className: name,
-			pos: pos,
+			className: type.name,
+			pos: type.pos,
 			typeInfo: typeInfo,
 			anonFuncCounter: 0,
 			isInline: false,
-			isAbstract: isAbstract,
+			isAbstract: false,
 			allReturns: false,
-			level: currentLevel,
+			level: typeLevel,
 			missingBranches: []
 		};
-		var fields:Array<Field> = Context.getBuildFields();
-		for (field in fields) {
-			instrumentField(field);
-		}
-		return fields;
 	}
 
 	static function instrumentField(field:Field) {
@@ -284,7 +297,7 @@ class Instrumentation {
 		switch (field.kind) {
 			case FFun(fun) if (fun.expr != null):
 				var isMain:Bool = (funcName == "main") && field.access.contains(AStatic);
-				if (!field.access.contains(AExtern)) {
+				if (!field.access.contains(AExtern) && !context.isAbstract) {
 					field.access.remove(AInline);
 					context.isInline = false;
 				}
@@ -344,7 +357,11 @@ class Instrumentation {
 		var location:Location = PositionTools.toLocation(field.pos);
 		var fieldInfo:FieldInfo = new FieldInfo(coverageContext.nextId(), field.name, location.locationToString(), location.range.start.line,
 			location.range.end.line);
-		context.typeInfo.addField(fieldInfo);
+		switch (context.level) {
+			case None | Profiling:
+			case Coverage | Both:
+				context.typeInfo.addField(fieldInfo);
+		}
 		context.fieldInfo = fieldInfo;
 	}
 

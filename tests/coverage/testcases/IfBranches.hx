@@ -62,6 +62,38 @@ class IfBranches implements ICoverageTestee {
 		doNothing();
 	}
 
+	public function ifBranchOpBool1(val1:Bool, val2:Bool) {
+		if (val1 || val2) {
+			doNothing();
+			return;
+		}
+		doNothing();
+	}
+
+	public function ifBranchOpBool2(val1:Bool, val2:Bool) {
+		if (val1 || val2) {
+			doNothing();
+			return;
+		}
+		doNothing();
+	}
+
+	public function ifBranchOpBool3(val1:Bool, val2:Bool) {
+		if (val1 || val2) {
+			doNothing();
+			return;
+		}
+		doNothing();
+	}
+
+	public function ifBranchOpBool4(val1:Bool, val2:Bool) {
+		if (val1 || val2) {
+			doNothing();
+			return;
+		}
+		doNothing();
+	}
+
 	function doNothing() {}
 
 	public function run() {
@@ -74,6 +106,21 @@ class IfBranches implements ICoverageTestee {
 		ifBranchOpBoolAll(true, false);
 		ifBranchOpBoolAll(false, true);
 		ifBranchOpBoolAll(true, true);
+
+		ifBranchOpBool1(true, true);
+
+		ifBranchOpBool2(true, true);
+		ifBranchOpBool2(true, false);
+
+		ifBranchOpBool3(true, true);
+		ifBranchOpBool3(true, false);
+		ifBranchOpBool3(false, true);
+
+		ifBranchOpBool4(true, true);
+		ifBranchOpBool4(true, false);
+		ifBranchOpBool4(false, true);
+		ifBranchOpBool4(false, false);
+
 		opBoolOr(1);
 		opBoolOr(3);
 		opBoolOr(4);

@@ -29,6 +29,17 @@ class TestCoverage implements ITest {
 
 		data.addMissing(56, Branch);
 
+		data.addMissing(66, Branch);
+		data.addMissing(66, Expression);
+		data.addMissing(70, Expression);
+
+		data.addMissing(74, Branch);
+		data.addMissing(74, Expression);
+		data.addMissing(78, Expression);
+
+		data.addMissing(82, Branch);
+		data.addMissing(86, Expression);
+
 		data.save();
 
 		runTestee("coverage.testcases.IfBranches");

@@ -187,3 +187,11 @@ enum abstract Role(String) to String {
 	public var RoleSales = "sales";
 	public var RoleCustomer = "customer";
 }
+
+abstract Distance(Int) from Int {
+	@:op(A += B)
+	public inline function assignPlus(val:Int):Distance {
+		this = this + val * 100;
+		return this;
+	}
+}
