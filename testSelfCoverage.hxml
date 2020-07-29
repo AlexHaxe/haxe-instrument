@@ -3,6 +3,10 @@
 -cp tests
 
 -lib utest
+-lib safety
+
+--macro nullSafety("demo", StrictThreaded)
+--macro nullSafety("instrument", StrictThreaded)
 
 --macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
 --macro instrument.Instrumentation.coverage(["demo", "instrument"], ["src", "srcDemo"], ["demo"])

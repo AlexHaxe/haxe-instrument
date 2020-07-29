@@ -7,4 +7,5 @@ import instrument.dummy.DummyThread as Thread;
 #end
 
 using StringTools;
+using Safety;
 using instrument.profiler.LocationTools;

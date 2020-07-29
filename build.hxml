@@ -1,6 +1,9 @@
 -cp src
 -cp srcDemo
 
+-lib safety 
+--macro nullSafety("demo", StrictThreaded)
+
 --macro instrument.Instrumentation.profiling(["demo"], ["srcDemo"], [])
 --macro instrument.Instrumentation.coverage(["demo"], ["srcDemo"], [])
 # -D profiler-console-detail-reporter

@@ -22,6 +22,11 @@ class BranchesInfo {
 		this.startLine = startLine;
 		this.endLine = endLine;
 		branches = [];
+		count = 0;
+		branchCount = branches.length;
+		branchesCovered = 0;
+		lineCount = 0;
+		linesCovered = 0;
 	}
 
 	#if macro

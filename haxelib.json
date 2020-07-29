@@ -13,6 +13,8 @@
 	"contributors": [
 		"AlexHaxe"
 	],
-	"dependencies": {},
+	"dependencies": {
+		"safety": ""
+	},
 	"classPath": "src"
 }

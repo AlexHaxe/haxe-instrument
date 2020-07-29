@@ -124,7 +124,7 @@ class MyTestApp {
 		trace(cb(2));
 	}
 
-	public function getInt(field:String):Null<Int> {
+	public function getInt(field:Null<String>):Null<Int> {
 		var value:Null<Int> = 10;
 		if (field == null) {
 			return null;
@@ -172,6 +172,7 @@ class MyTestApp {
 	static function main() {
 		new MyTestApp(123, true);
 		ArrayTest.main();
+		NullSafety.main();
 	}
 }
 

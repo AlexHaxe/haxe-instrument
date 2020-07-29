@@ -27,6 +27,12 @@ class FieldInfo {
 		this.endLine = endLine;
 		expressions = [];
 		branches = [];
+		count = 0;
+		branchCount = 0;
+		branchesCovered = 0;
+		expressionsCovered = 0;
+		lineCount = 0;
+		linesCovered = 0;
 	}
 
 	#if macro

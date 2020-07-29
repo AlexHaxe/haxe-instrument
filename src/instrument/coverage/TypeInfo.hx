@@ -27,8 +27,14 @@ class TypeInfo {
 		this.file = file;
 		this.startLine = startLine;
 		this.endLine = endLine;
-
 		fields = [];
+		fieldsCovered = 0;
+		branchCount = 0;
+		branchesCovered = 0;
+		expressionCount = 0;
+		expressionsCovered = 0;
+		lineCount = 0;
+		linesCovered = 0;
 	}
 
 	#if macro

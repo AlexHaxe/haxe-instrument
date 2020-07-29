@@ -19,7 +19,6 @@ class FileInfo {
 	public function new(file:String, pack:String) {
 		this.file = file;
 		this.pack = pack;
-
 		typesCovered = 0;
 		fieldCount = 0;
 		fieldsCovered = 0;

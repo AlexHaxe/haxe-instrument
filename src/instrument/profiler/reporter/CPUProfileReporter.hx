@@ -22,10 +22,13 @@ class CPUProfileReporter extends FileBaseReporter implements IProfilerReporter {
 	public function startProfiler() {}
 
 	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
-		outputProfile(buildCPUProfile(root));
+		var profile:Null<CPUProfile> = buildCPUProfile(root);
+		if (profile != null) {
+			outputProfile(profile.sure());
+		}
 	}
 
-	function buildCPUProfile(tree:HierarchyCallData):CPUProfile {
+	function buildCPUProfile(tree:HierarchyCallData):Null<CPUProfile> {
 		if (tree == null) {
 			return null;
 		}
@@ -61,7 +64,7 @@ class CPUProfileReporter extends FileBaseReporter implements IProfilerReporter {
 		var lineNum:Int = -1;
 		if (index > 0) {
 			url = tree.location.substr(0, index);
-			lineNum = Std.parseInt(tree.location.substr(index + 1));
+			lineNum = Std.parseInt(tree.sure().location.substr(index + 1)).sure();
 		}
 		var callFrame:CPUCallFrame = {
 			functionName: tree.functionName,
@@ -92,7 +95,7 @@ class CPUProfileReporter extends FileBaseReporter implements IProfilerReporter {
 
 		profile.nodes.push(cpuNode);
 		if (tree.childs != null) {
-			for (child in tree.childs) {
+			for (child in tree.childs.sure()) {
 				collectChildNodes(child, profile);
 			}
 		}

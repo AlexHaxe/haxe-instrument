@@ -22,6 +22,7 @@ using instrument.InstrumentationType;
 
 @:ignoreProfiler
 class Instrumentation {
+	static inline final NULLSAFETY_META = ":nullSafety";
 	static inline final AFTER = "after ";
 	static inline final BEFORE = "before ";
 	static inline final DISPLAY = "display";
@@ -224,6 +225,10 @@ class Instrumentation {
 						context.isAbstract = true;
 					default:
 				}
+				if (type.meta.has(NULLSAFETY_META)) {
+					type.meta.remove(NULLSAFETY_META);
+					type.meta.add(NULLSAFETY_META, [macro Off], type.pos);
+				}
 			default:
 				return null;
 		}
@@ -302,6 +307,7 @@ class Instrumentation {
 					context.isInline = false;
 				}
 				initFieldContext(field);
+				removeNullSafety(field);
 				context.allReturns = hasAllReturns(fun.expr);
 				#if debug_instrumentation
 				trace(BEFORE + fun.expr.toString());
@@ -316,6 +322,7 @@ class Instrumentation {
 					return;
 				}
 				initFieldContext(field);
+				removeNullSafety(field);
 				#if debug_instrumentation
 				trace(BEFORE + expr.toString());
 				#end
@@ -330,6 +337,7 @@ class Instrumentation {
 					return;
 				}
 				initFieldContext(field);
+				removeNullSafety(field);
 				#if debug_instrumentation
 				trace(BEFORE + expr.toString());
 				#end
@@ -351,6 +359,19 @@ class Instrumentation {
 		context.isInline = field.access.contains(AInline);
 		context.allReturns = false;
 		context.missingBranches = [];
+	}
+
+	static function removeNullSafety(field:Field) {
+		if (field.meta == null) {
+			return;
+		}
+		for (meta in field.meta) {
+			switch (meta.name) {
+				case NULLSAFETY_META:
+					meta.params = [macro Off];
+				default:
+			}
+		}
 	}
 
 	static function initFieldContext(field:Field) {

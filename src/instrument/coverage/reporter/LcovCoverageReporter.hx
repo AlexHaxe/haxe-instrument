@@ -18,13 +18,13 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		var fileTypeMap:Map<String, Array<TypeInfo>> = new Map<String, Array<TypeInfo>>();
 		for (type in context.types) {
 			if (fileTypeMap.exists(type.file)) {
-				fileTypeMap.get(type.file).push(type);
+				fileTypeMap.get(type.file).sure().push(type);
 				continue;
 			}
 			fileTypeMap.set(type.file, [type]);
 		}
-		for (file in fileTypeMap.keys()) {
-			reportFile(file, fileTypeMap.get(file));
+		for (file => types in fileTypeMap) {
+			reportFile(file, types);
 		}
 	}
 
@@ -88,7 +88,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 							lineCov.set(line, expr.count);
 							continue;
 						}
-						count = lineCov.get(line);
+						count = lineCov.get(line).sure();
 						if (count <= expr.count) {
 							continue;
 						}
@@ -118,7 +118,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 			if (!lineCov.exists(line)) {
 				continue;
 			}
-			var count:Int = lineCov.get(line);
+			var count:Int = lineCov.get(line).sure();
 			text.add(makeLine("DA", '${line},${count}'));
 		}
 		text.add("\n");
@@ -153,7 +153,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 							lineCov.set(branch.startLine, cov);
 							continue;
 						}
-						var oldCov:{block:Int, branch:Int, count:Int} = lineCov.get(branch.startLine);
+						var oldCov:{block:Int, branch:Int, count:Int} = lineCov.get(branch.startLine).sure();
 						if (oldCov.count > cov.count) {
 							lineCov.set(branch.startLine, cov);
 						}
@@ -164,7 +164,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		var lines:Array<Int> = [for (line => _ in lineCov) line];
 		lines.sort((a, b) -> (a < b) ? -1 : 1);
 		for (line in lines) {
-			var cov:{block:Int, branch:Int, count:Int} = lineCov.get(line);
+			var cov:{block:Int, branch:Int, count:Int} = lineCov.get(line).sure();
 			if (cov.count <= 0) {
 				text.add(makeLine("BRDA", '${line},${cov.block},${cov.branch},-'));
 			} else {

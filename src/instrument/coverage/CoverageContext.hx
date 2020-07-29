@@ -30,6 +30,17 @@ class CoverageContext {
 		types = [];
 		files = [];
 		packages = [];
+		filesCovered = 0;
+		packagesCovered = 0;
+		typesCovered = 0;
+		fieldCount = 0;
+		fieldsCovered = 0;
+		branchCount = 0;
+		branchesCovered = 0;
+		expressionCount = 0;
+		expressionsCovered = 0;
+		lineCount = 0;
+		linesCovered = 0;
 	}
 
 	public function addType(type:TypeInfo) {
@@ -56,22 +67,22 @@ class CoverageContext {
 		if (covered == null) {
 			covered = new Map<Int, Int>();
 		}
-		lock.acquire();
+		lock.sure().acquire();
 		#if debug_log_expression
 		trace("logExpression(" + logId + ")");
 		#end
-		if (covered.exists(logId)) {
-			covered.set(logId, covered.get(logId) + 1);
+		if (covered.sure().exists(logId)) {
+			covered.sure().set(logId, covered.sure().get(logId).sure() + 1);
 		} else {
-			covered.set(logId, 1);
+			covered.sure().set(logId, 1);
 		}
-		lock.release();
+		lock.sure().release();
 	}
 
 	public function calcStatistic() {
 		function getCoverage(id:Int):Int {
-			if (CoverageContext.covered.exists(id)) {
-				return CoverageContext.covered.get(id);
+			if (CoverageContext.covered.sure().exists(id)) {
+				return CoverageContext.covered.sure().get(id).sure();
 			}
 			return 0;
 		}
@@ -113,7 +124,7 @@ class CoverageContext {
 		for (type in types) {
 			var fileInfo:FileInfo;
 			if (fileMap.exists(type.file)) {
-				fileInfo = fileMap.get(type.file);
+				fileInfo = fileMap.get(type.file).sure();
 			} else {
 				fileInfo = new FileInfo(type.file, type.pack);
 				fileMap.set(type.file, fileInfo);
@@ -135,7 +146,7 @@ class CoverageContext {
 		for (type in types) {
 			var packInfo:PackageInfo;
 			if (packageMap.exists(type.pack)) {
-				packInfo = packageMap.get(type.pack);
+				packInfo = packageMap.get(type.pack).sure();
 			} else {
 				packInfo = new PackageInfo(type.pack, allFiles);
 				packageMap.set(type.pack, packInfo);

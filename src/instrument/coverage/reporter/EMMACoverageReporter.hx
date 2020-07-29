@@ -80,7 +80,7 @@ class EMMACoverageReporter extends FileBaseReporter implements ICoverageReporter
 		for (type in pack.types) {
 			var fileInfo:FileInfo;
 			if (fileMap.exists(type.file)) {
-				fileInfo = fileMap.get(type.file);
+				fileInfo = fileMap.get(type.file).sure();
 			} else {
 				fileInfo = new FileInfo(type.file, pack.pack);
 				fileMap.set(type.file, fileInfo);

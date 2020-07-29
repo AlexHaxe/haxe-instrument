@@ -49,7 +49,7 @@ class HierarchicalSummary implements ISummary {
 
 	public function exitFunction(data:CallData) {
 		lock.acquire();
-		var current:HierarchyCallData = stack.pop();
+		var current:HierarchyCallData = stack.pop().sure();
 		current.addDuration(data);
 		lock.release();
 	}

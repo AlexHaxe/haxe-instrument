@@ -97,7 +97,7 @@ class TestCoverage implements ITest {
 
 	function runTestee(testeeClass:String, ?pos:PosInfos) {
 		var params:Array<String> = [
-			"haxe", "-cp", "src", "-cp", "tests", "-D", "test-class=" + testeeClass, "--macro",
+			"haxe", "-cp", "src", "-cp", "tests", "-lib", "safety", "-D", "test-class=" + testeeClass, "--macro",
 			'instrument.Instrumentation.coverage([\'$testeeClass\'],[\'tests\'],[])', "-main", "coverage.testee.CoverageTestMain", "--run",
 			"coverage.testee.CoverageTestMain"
 		];

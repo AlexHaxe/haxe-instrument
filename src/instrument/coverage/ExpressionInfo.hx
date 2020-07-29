@@ -15,6 +15,7 @@ class ExpressionInfo {
 		this.location = location;
 		this.startLine = startLine;
 		this.endLine = endLine;
+		count = 0;
 	}
 
 	public function calcStatistic(cb:GetCoverageCount) {

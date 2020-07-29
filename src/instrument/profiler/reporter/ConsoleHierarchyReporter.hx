@@ -40,7 +40,7 @@ class ConsoleHierarchyReporter implements IProfilerReporter {
 		if (tree.childs == null) {
 			return;
 		}
-		for (child in tree.childs) {
+		for (child in tree.childs.sure()) {
 			printTree(child, indent + "---");
 		}
 	}

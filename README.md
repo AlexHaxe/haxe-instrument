@@ -5,7 +5,9 @@
 [![codecov](https://codecov.io/gh/AlexHaxe/haxe-instrument/branch/master/graph/badge.svg)](https://codecov.io/gh/AlexHaxe/haxe-instrument)
 
 profiling and coverage will instrument your code to include calls to profile and coverage data collector logic.  
-for that purpose all inlining of included types will be disabled.
+
+for that purpose instrument will disable all inlining of included types except for abstracts.
+additionally it will switch off all null safety metadata on types and fields included for instrumentation.
 
 for an example use of instrument run `haxe build.hxml` and play with different cli options (see commented out lines in `build.hxml`)
 

@@ -21,11 +21,13 @@ class D3FlameHierarchyReporter extends FileBaseReporter implements IProfilerRepo
 	public function startProfiler() {}
 
 	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
-		var d3Root:D3FlameNode = buildD3FlameData(root);
-		outputFlame(d3Root);
+		var d3Root:Null<D3FlameNode> = buildD3FlameData(root);
+		if (d3Root != null) {
+			outputFlame(d3Root.sure());
+		}
 	}
 
-	function buildD3FlameData(tree:HierarchyCallData):D3FlameNode {
+	function buildD3FlameData(tree:HierarchyCallData):Null<D3FlameNode> {
 		if (tree == null) {
 			return null;
 		}

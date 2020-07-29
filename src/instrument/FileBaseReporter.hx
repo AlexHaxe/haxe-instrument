@@ -7,13 +7,13 @@ class FileBaseReporter {
 
 	public function new(fileName:Null<String>, defineFileName:Null<String>, defaultFileName:String) {
 		if (fileName == null) {
-			if ((defineFileName == null) || (defineFileName.length <= 0) || (defineFileName == "1")) {
+			if ((defineFileName == null) || (defineFileName.sure().length <= 0) || (defineFileName == "1")) {
 				fileName = defaultFileName;
 			} else {
 				fileName = defineFileName;
 			}
 		}
-		this.fileName = fileName;
+		this.fileName = fileName.sure();
 	}
 
 	function output(text:String) {

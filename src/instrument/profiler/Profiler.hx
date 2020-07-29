@@ -13,41 +13,41 @@ import instrument.profiler.summary.ThreadSummaryContext;
 @:expose
 class Profiler {
 	static var profilerId:Null<Int>;
-	static var pendingCalls:Map<String, CallData>;
-	static var lock:Mutex;
-	static var reporter:Array<IProfilerReporter>;
-	static var completed:Bool;
+	static var pendingCalls:Null<Map<String, CallData>>;
+	static var lock:Null<Mutex>;
+	static var reporter:Null<Array<IProfilerReporter>>;
+	static var completed:Bool = false;
 
-	static var threads:Array<Thread>;
-	static var threadContexts:Map<Int, ThreadSummaryContext>;
+	static var threads:Null<Array<Thread>>;
+	static var threadContexts:Null<Map<Int, ThreadSummaryContext>>;
 
 	static function getThreadContext():ThreadSummaryContext {
-		var context:ThreadSummaryContext = null;
+		var context:Null<ThreadSummaryContext> = null;
 
 		if (lock == null) {
 			lock = new Mutex();
 		}
-		lock.acquire();
+		lock.sure().acquire();
 
 		var threadId:Int = determineThreadId();
 		if (threadContexts == null) {
 			threadContexts = new Map<Int, ThreadSummaryContext>();
 		}
-		if (!threadContexts.exists(threadId)) {
+		if (!threadContexts.sure().exists(threadId)) {
 			context = {
 				threadId: threadId,
 				itsMe: false,
 				flatSummary: new FlatSummary(),
 				hierarchicalSummary: new HierarchicalSummary(threadId)
 			};
-			threadContexts.set(threadId, context);
+			threadContexts.sure().set(threadId, context);
 		} else {
-			context = threadContexts.get(threadId);
+			context = threadContexts.sure().get(threadId);
 		}
 
-		lock.release();
+		lock.sure().release();
 
-		return context;
+		return context.sure();
 	}
 
 	static function determineThreadId():Int {
@@ -70,7 +70,7 @@ class Profiler {
 		#end
 	}
 
-	public static function enterFunction(location:String, className:String, functionName:String, argNames:Array<String>):Int {
+	public static function enterFunction(location:String, className:String, functionName:String, argNames:Null<Array<String>>):Int {
 		var context:ThreadSummaryContext = getThreadContext();
 		if (context == null) {
 			return -1;
@@ -83,7 +83,7 @@ class Profiler {
 		if (completed) {
 			return -1;
 		}
-		lock.acquire();
+		lock.sure().acquire();
 		var newId:Int = nextId();
 		var data:CallData = {
 			id: newId,
@@ -100,15 +100,15 @@ class Profiler {
 			pendingCalls = new Map<String, CallData>();
 		}
 
-		pendingCalls.set('$newId', data);
+		pendingCalls.sure().set('$newId', data);
 		for (s in [context.flatSummary, context.hierarchicalSummary]) {
 			s.enterFunction(data);
 		}
-		for (r in reporter) {
+		for (r in reporter.sure()) {
 			r.enterFunction(data);
 		}
 		context.itsMe = false;
-		lock.release();
+		lock.sure().release();
 
 		return newId;
 	}
@@ -125,22 +125,22 @@ class Profiler {
 			return;
 		}
 		context.itsMe = true;
-		lock.acquire();
-		var data:CallData = pendingCalls.get('$id');
+		lock.sure().acquire();
+		var data:CallData = pendingCalls.sure().get('$id').sure();
 		if (data == null) {
 			context.itsMe = false;
-			lock.release();
+			lock.sure().release();
 			return;
 		}
 		if (data != null) {
 			data.endTime = Timer.stamp();
 		}
-		pendingCalls.remove('$id');
-		lock.release();
+		pendingCalls.sure().remove('$id');
+		lock.sure().release();
 		for (s in [context.flatSummary, context.hierarchicalSummary]) {
 			s.exitFunction(data);
 		}
-		for (r in reporter) {
+		for (r in reporter.sure()) {
 			r.exitFunction(data);
 		}
 		context.itsMe = false;
@@ -157,7 +157,7 @@ class Profiler {
 		context.itsMe = true;
 		completed = true;
 
-		for (threadId => ctx in threadContexts) {
+		for (threadId => ctx in threadContexts.sure()) {
 			ctx.itsMe = true;
 			for (s in [ctx.flatSummary, ctx.hierarchicalSummary]) {
 				s.endProfiler();
@@ -167,7 +167,7 @@ class Profiler {
 		var summary:Array<CallSummaryData> = [];
 		var root:HierarchyCallData = new HierarchyCallData(null, null);
 		var duration:Float = 0;
-		for (_ => ctx in threadContexts) {
+		for (_ => ctx in threadContexts.sure()) {
 			root.addChildNode(ctx.hierarchicalSummary.root);
 			duration += ctx.hierarchicalSummary.root.duration;
 			for (key => value in ctx.flatSummary.summary) {
@@ -176,10 +176,10 @@ class Profiler {
 		}
 		root.setDuration(duration);
 
-		for (r in reporter) {
+		for (r in reporter.sure()) {
 			r.endProfiler(summary, root);
 		}
-		for (_ => ctx in threadContexts) {
+		for (_ => ctx in threadContexts.sure()) {
 			ctx.itsMe = false;
 		}
 		completed = false;
@@ -189,7 +189,7 @@ class Profiler {
 		if (profilerId == null) {
 			profilerId = 1;
 		}
-		var next:Int = profilerId++;
+		var next:Int = @:nullSafety(Off) profilerId++;
 		return next;
 	}
 
@@ -205,34 +205,34 @@ class Profiler {
 		reporter = [];
 
 		#if profiler_console_detail_reporter
-		reporter.push(new instrument.profiler.reporter.ConsoleDetailReporter());
+		reporter.sure().push(new instrument.profiler.reporter.ConsoleDetailReporter());
 		#end
 
 		#if profiler_console_missing_reporter
-		reporter.push(new instrument.profiler.reporter.ConsoleMissedExitReporter());
+		reporter.sure().push(new instrument.profiler.reporter.ConsoleMissedExitReporter());
 		#end
 
 		#if profiler_console_summary_reporter
-		reporter.push(new instrument.profiler.reporter.ConsoleSummaryReporter());
+		reporter.sure().push(new instrument.profiler.reporter.ConsoleSummaryReporter());
 		#end
 
 		#if profiler_console_hierarchy_reporter
-		reporter.push(new instrument.profiler.reporter.ConsoleHierarchyReporter());
+		reporter.sure().push(new instrument.profiler.reporter.ConsoleHierarchyReporter());
 		#end
 
 		#if profiler_csv_reporter
-		reporter.push(new instrument.profiler.reporter.CSVSummaryReporter());
+		reporter.sure().push(new instrument.profiler.reporter.CSVSummaryReporter());
 		#end
 
 		#if profiler_d3_reporter
-		reporter.push(new instrument.profiler.reporter.D3FlameHierarchyReporter());
+		reporter.sure().push(new instrument.profiler.reporter.D3FlameHierarchyReporter());
 		#end
 
 		#if profiler_cpuprofile_reporter
-		reporter.push(new instrument.profiler.reporter.CPUProfileReporter());
+		reporter.sure().push(new instrument.profiler.reporter.CPUProfileReporter());
 		#end
 
-		for (r in reporter) {
+		for (r in reporter.sure()) {
 			r.startProfiler();
 		}
 	}

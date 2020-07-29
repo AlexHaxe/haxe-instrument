@@ -113,7 +113,7 @@ class JaCoCoXmlCoverageReporter extends FileBaseReporter implements ICoverageRep
 
 	function setLineCounterInstructions(lineInfo:Map<Int, JacocoLineCounters>, line:Int, count:Int, covered:Int) {
 		if (lineInfo.exists(line)) {
-			var info:JacocoLineCounters = lineInfo.get(line);
+			var info:JacocoLineCounters = lineInfo.get(line).sure();
 			info.coveredExpr += covered;
 			info.missedExpr += (count - covered);
 		} else {
@@ -130,7 +130,7 @@ class JaCoCoXmlCoverageReporter extends FileBaseReporter implements ICoverageRep
 
 	function setLineCounterBranches(lineInfo:Map<Int, JacocoLineCounters>, line:Int, count:Int, covered:Int) {
 		if (lineInfo.exists(line)) {
-			var info:JacocoLineCounters = lineInfo.get(line);
+			var info:JacocoLineCounters = lineInfo.get(line).sure();
 			info.coveredBranches += covered;
 			info.missedBranches += (count - covered);
 		} else {
@@ -150,7 +150,7 @@ class JaCoCoXmlCoverageReporter extends FileBaseReporter implements ICoverageRep
 		for (type in pack.types) {
 			var fileInfo:FileInfo;
 			if (fileMap.exists(type.file)) {
-				fileInfo = fileMap.get(type.file);
+				fileInfo = fileMap.get(type.file).sure();
 			} else {
 				fileInfo = new FileInfo(type.file, pack.pack);
 				fileMap.set(type.file, fileInfo);

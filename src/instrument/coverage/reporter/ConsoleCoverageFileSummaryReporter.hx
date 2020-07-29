@@ -168,7 +168,7 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 		var lastPrefix:String = "";
 		var lastCount:Int = 0;
 		for (prefix in prefixCandidates) {
-			var count:Int = prefixCandidateCounter.get(prefix);
+			var count:Int = prefixCandidateCounter.get(prefix).sure();
 			if (lastPrefix.length <= 0) {
 				lastPrefix = prefix;
 				lastCount = count;
@@ -218,7 +218,7 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 	}
 
 	function addPrefixes(prefixCandidates:Map<String, Int>, fileName:String) {
-		var folder:String = new Path(fileName).dir;
+		var folder:String = new Path(fileName).dir.sure();
 		while (folder.length > 0) {
 			addPrefix(prefixCandidates, folder + "/");
 			folder = Path.directory(folder);
@@ -227,7 +227,7 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 
 	function addPrefix(prefixCandidates:Map<String, Int>, prefix:String) {
 		if (prefixCandidates.exists(prefix)) {
-			prefixCandidates.set(prefix, prefixCandidates.get(prefix) + 1);
+			prefixCandidates.set(prefix, prefixCandidates.get(prefix).sure() + 1);
 		} else {
 			prefixCandidates.set(prefix, 1);
 		}

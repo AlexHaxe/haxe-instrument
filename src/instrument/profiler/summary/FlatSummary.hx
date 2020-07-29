@@ -30,8 +30,8 @@ class FlatSummary implements ISummary {
 			};
 			summary.set(data.location, callSummary);
 		}
-		callSummary.count++;
-		callSummary.duration += data.endTime - data.startTime;
+		callSummary.sure().count++;
+		callSummary.sure().duration += data.endTime - data.startTime;
 		lock.release();
 	}
 }
