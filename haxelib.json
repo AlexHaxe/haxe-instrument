@@ -8,8 +8,8 @@
 		"profiler"
 	],
 	"description": "a profiling and coverage library for Haxe",
-	"version": "1.0.0",
-	"releasenote": "initial release",
+	"version": "1.1.0",
+	"releasenote": "added field level exclusion metadata and support for null safety enabled code, also bugfixes - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],

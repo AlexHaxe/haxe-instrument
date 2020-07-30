@@ -2,6 +2,8 @@
 
 ## dev branch / next version (1.x.x)
 
+## version 1.1.0 (2020-07-30)
+
 - added support for field level exclusion metadata
 - added safety lib dependency
 - fixed handling of abstract types, fixes [#1](https://github.com/AlexHaxe/haxe-instrument/issues/1)
