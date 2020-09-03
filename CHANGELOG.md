@@ -2,6 +2,8 @@
 
 ## dev branch / next version (1.x.x)
 
+- fixed exception in calcStatistic with empty coverage data
+
 ## version 1.1.0 (2020-07-30)
 
 - added support for field level exclusion metadata

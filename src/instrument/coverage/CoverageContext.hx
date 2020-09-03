@@ -80,6 +80,9 @@ class CoverageContext {
 	}
 
 	public function calcStatistic() {
+		if (covered == null) {
+			return;
+		}
 		function getCoverage(id:Int):Int {
 			if (CoverageContext.covered.sure().exists(id)) {
 				return CoverageContext.covered.sure().get(id).sure();
