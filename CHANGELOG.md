@@ -2,6 +2,7 @@
 
 ## dev branch / next version (1.x.x)
 
+- added canRemoveInline to detect `this` assignments
 - fixed exception in calcStatistic with empty coverage data
 
 ## version 1.1.0 (2020-07-30)

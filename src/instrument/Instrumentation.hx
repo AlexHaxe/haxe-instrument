@@ -302,7 +302,7 @@ class Instrumentation {
 		switch (field.kind) {
 			case FFun(fun) if (fun.expr != null):
 				var isMain:Bool = (funcName == "main") && field.access.contains(AStatic);
-				if (!field.access.contains(AExtern) && !context.isAbstract) {
+				if (!field.access.contains(AExtern) && canRemoveInline(fun.expr)) {
 					field.access.remove(AInline);
 					context.isInline = false;
 				}
@@ -349,6 +349,31 @@ class Instrumentation {
 				field.kind = FProp(get, set, type, expr);
 			default:
 		}
+	}
+
+	static function canRemoveInline(expr:Expr):Bool {
+		if (!context.isAbstract) {
+			return true;
+		}
+		if (!context.isInline) {
+			return true;
+		}
+		switch (expr.expr) {
+			case EBlock(exprs):
+				for (childExpr in exprs) {
+					switch (childExpr.expr) {
+						case EBinop(OpAssign, e1, _) | EBinop(OpAssignOp(_), e1, _):
+							switch (e1.expr) {
+								case EConst(CIdent("this")):
+									return false;
+								default:
+							}
+						default:
+					}
+				}
+			default:
+		}
+		return true;
 	}
 
 	static function initContext(field:Field) {
