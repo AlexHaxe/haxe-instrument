@@ -17,6 +17,8 @@ class MyTestApp {
 		moduleBody();
 		moduleBody();
 		moduleBody();
+		var image:ImageName = "test";
+
 		trace(arrow(val));
 		noBody4(function(val) {
 			noBody5(11);

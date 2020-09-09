@@ -22,6 +22,7 @@
 -D coverage-codecov-reporter
 -D coverage-jacocoxml-reporter
 -D coverage-emma-reporter
+-D instrument-quiet
 
 # -D debug-instrumentation
 # -D debug-log-expression

@@ -110,7 +110,9 @@ class Instrumentation {
 		Compiler.addGlobalMetadata("Sys", "@:build(instrument.Instrumentation.sysExitField())", true, true, false);
 		Compiler.addGlobalMetadata("haxe.EntryPoint", "@:build(instrument.Instrumentation.entrypointRunField())", true, true, false);
 		coverageContext = new CoverageContext();
+		#if (!instrument_quiet)
 		Sys.print("Instrumenting ");
+		#end
 	}
 
 	static function filterType(pack:String, location:Location):InstrumentationType {
@@ -238,7 +240,9 @@ class Instrumentation {
 				return null;
 			case Coverage | Profiling | Both:
 		}
+		#if (!instrument_quiet)
 		Sys.print(".");
+		#end
 
 		var fields:Array<Field> = Context.getBuildFields();
 		var typeLevel:InstrumentationType = context.level;
@@ -812,6 +816,12 @@ class Instrumentation {
 			return (macro {
 				instrument.profiler.Profiler.exitFunction(__profiler__id__);
 				return;
+			});
+		}
+		if ((context.fieldName == "new") || (context.fieldName == "_new")) {
+			return (macro {
+				instrument.profiler.Profiler.exitFunction(__profiler__id__);
+				return $expr;
 			});
 		}
 		return (macro {

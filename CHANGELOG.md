@@ -3,7 +3,9 @@
 ## dev branch / next version (1.x.x)
 
 - added canRemoveInline to detect `this` assignments
+- added `-D instrument-quiet``conditional to skip printing dots during instrumentation
 - fixed exception in calcStatistic with empty coverage data
+- fixed handling of abstract constructors
 
 ## version 1.1.0 (2020-07-30)
 
