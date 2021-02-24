@@ -433,14 +433,14 @@ class Instrumentation {
 		var exprs:Array<Expr> = exprsFromBlock(expr);
 		var location:Location = PositionTools.toLocation(context.pos);
 
-		var entry:Expr = macro var __profiler__id__:Int = instrument.profiler.Profiler.enterFunction($v{location.locationToString()}, $v{context.className},
-			$v{context.fieldName}, null);
-		var exit:Expr = macro instrument.profiler.Profiler.exitFunction(__profiler__id__);
 		var covExpr:Expr = macro instrument.coverage.CoverageContext.logExpression($v{context.fieldInfo.id});
 		if (withCoverage) {
 			exprs.unshift(covExpr);
 		}
 		if (withProfiler) {
+			var exit:Expr = macro instrument.profiler.Profiler.exitFunction(__profiler__id__);
+			var entry:Expr = macro var __profiler__id__:Int = instrument.profiler.Profiler.enterFunction($v{location.locationToString()},
+				$v{context.className}, $v{context.fieldName}, null);
 			exprs.unshift(entry);
 			if (!context.allReturns) {
 				exprs.push(exit);
@@ -574,7 +574,7 @@ class Instrumentation {
 			case ESwitch(e, cases, edef):
 				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
 
-				e = instrumentExpr(ensureBlockExpr(e));
+				e = instrumentExpr(e);
 				if ((edef != null) && (edef.expr != null)) {
 					edef = coverBranch(instrumentExpr(ensureBlockExpr(edef)), expr.pos, branchesInfo);
 				}

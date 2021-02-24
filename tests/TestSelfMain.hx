@@ -1,11 +1,10 @@
-import sys.FileSystem;
 import demo.MyTestApp;
 import instrument.Instrumentation;
-import instrument.InstrumentationType;
 import instrument.InstrumentationTypeTest;
 import utest.ITest;
 import utest.Runner;
 import utest.ui.Report;
+import utest.ui.text.DiagnosticsReport;
 
 class TestSelfMain {
 	public static function main() {
@@ -19,7 +18,7 @@ class TestSelfMain {
 			Instrumentation.endInstrumentation(Profiling);
 			Instrumentation.endInstrumentation(Both);
 		});
-		Report.create(runner);
+		new DiagnosticsReport(runner);
 		for (test in tests) {
 			runner.addCase(test());
 		}

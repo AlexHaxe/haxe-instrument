@@ -198,3 +198,11 @@ abstract Distance(Int) from Int {
 		return this;
 	}
 }
+
+function testMe(a:Int, b:String):String {
+	return switch [a, b] {
+		case [_, "a"]: "A";
+		case [1, _]: "B";
+		case _: "C";
+	}
+}
