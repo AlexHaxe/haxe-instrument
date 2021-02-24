@@ -1,7 +1,9 @@
 package instrument;
 
 import haxe.io.Path;
+#if (sys || nodejs)
 import sys.FileSystem;
+#end
 #if macro
 import haxe.display.Position.Location;
 import haxe.macro.Compiler;
