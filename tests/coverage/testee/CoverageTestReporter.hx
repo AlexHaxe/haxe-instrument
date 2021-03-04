@@ -2,7 +2,6 @@ package coverage.testee;
 
 import instrument.coverage.CoverageContext;
 import instrument.coverage.reporter.ConsoleMissingCoverageReporter;
-import coverage.testee.ExpectedCoverageData.MissedCoverageType;
 
 class CoverageTestReporter extends ConsoleMissingCoverageReporter {
 	public function new() {
@@ -16,6 +15,7 @@ class CoverageTestReporter extends ConsoleMissingCoverageReporter {
 		if (data.missedItems.length != outputLines.length) {
 			trace("number of missed items mismatch: " + data.missedItems.length + " != " + outputLines.length);
 			trace(outputLines.map(l -> '${l.lineNumber}: ${l.text}\n'));
+			trace(data.missedItems.map(l -> '${l.line}: ${l.missedType}\n'));
 			Sys.exit(-1);
 		}
 		for (item in data.missedItems) {
@@ -37,7 +37,6 @@ class CoverageTestReporter extends ConsoleMissingCoverageReporter {
 		}
 		Sys.exit(0);
 	}
-
 
 	override function output(text:String) {}
 }

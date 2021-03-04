@@ -2,7 +2,7 @@ import sys.FileSystem;
 import coverage.TestCoverage;
 import utest.ITest;
 import utest.Runner;
-import utest.ui.Report;
+import utest.ui.text.DiagnosticsReport;
 
 class TestMain {
 	public static function main() {
@@ -11,7 +11,7 @@ class TestMain {
 		runner.onComplete.add(_ -> {
 			FileSystem.deleteFile("tests/.missing-data.json");
 		});
-		Report.create(runner);
+		new DiagnosticsReport(runner);
 		for (test in tests) {
 			runner.addCase(test());
 		}

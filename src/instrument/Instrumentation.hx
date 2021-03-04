@@ -727,16 +727,17 @@ class Instrumentation {
 			case Both:
 		}
 		var location:Location = PositionTools.toLocation(expr.pos);
-		var branchInfo1:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		var branchInfo2:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		branchesInfo.addBranch(branchInfo1);
-		branchesInfo.addBranch(branchInfo2);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
 
-		var covExpr1:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchInfo1.id}); true;}
-		var covExpr2:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchInfo2.id}); false;}
-		expr = instrumentExpr(ensureBlockExpr(expr));
+		var varExpr:Expr = {expr: EVars([{name: "_instrumentValue", expr: instrumentExpr(ensureBlockExpr(expr))}]), pos: expr.pos};
+		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); _instrumentValue;}
+		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); false;}
 
-		return {expr: EIf(expr, covExpr1, covExpr2), pos: expr.pos}
+		var ifExpr:Expr = {expr: EIf(macro cast _instrumentValue, trueExpr, falseExpr), pos: expr.pos};
+		return {expr: EBlock([varExpr, ifExpr]), pos: expr.pos};
 	}
 
 	static function coverCondition(expr:Expr, branchesInfo:BranchesInfo):Expr {
@@ -747,15 +748,15 @@ class Instrumentation {
 			case Both:
 		}
 		var location:Location = PositionTools.toLocation(expr.pos);
-		var branchInfo1:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		var branchInfo2:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		branchesInfo.addBranch(branchInfo1);
-		branchesInfo.addBranch(branchInfo2);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
 
-		var covExpr1:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchInfo1.id}); true;}
-		var covExpr2:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchInfo2.id}); false;}
+		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); true;}
+		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); false;}
 
-		return {expr: EIf(expr, covExpr1, covExpr2), pos: expr.pos};
+		return {expr: EIf(expr, trueExpr, falseExpr), pos: expr.pos};
 	}
 
 	static function hasAllReturns(expr:Expr):Bool {

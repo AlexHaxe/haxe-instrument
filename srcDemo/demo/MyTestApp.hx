@@ -1,6 +1,7 @@
 package demo;
 
 import haxe.Exception;
+import demo.OpOverload.testOp;
 
 class MyTestApp {
 	var arrow = (a) -> a + 1;
@@ -59,6 +60,8 @@ class MyTestApp {
 
 		if (false)
 			Sys.exit(0);
+
+		testOp(true, false);
 	}
 
 	public function switchVal(val:Int) {
