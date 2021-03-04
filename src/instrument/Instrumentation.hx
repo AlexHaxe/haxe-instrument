@@ -732,7 +732,9 @@ class Instrumentation {
 		branchesInfo.addBranch(branchTrue);
 		branchesInfo.addBranch(branchFalse);
 
-		var varExpr:Expr = {expr: EVars([{name: "_instrumentValue", expr: instrumentExpr(ensureBlockExpr(expr))}]), pos: expr.pos};
+		var varExpr:Expr = {expr: EVars([
+			{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(expr))}
+		]), pos: expr.pos};
 		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); _instrumentValue;}
 		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); false;}
 
