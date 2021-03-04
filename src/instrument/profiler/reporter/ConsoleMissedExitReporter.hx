@@ -2,7 +2,7 @@ package instrument.profiler.reporter;
 
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
-import instrument.profiler.summary.HierarchyCallData;
+import instrument.profiler.summary.HierarchicalData;
 
 class ConsoleMissedExitReporter implements IProfilerReporter {
 	var lock:Mutex;
@@ -17,7 +17,7 @@ class ConsoleMissedExitReporter implements IProfilerReporter {
 
 	public function startProfiler() {}
 
-	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
+	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchicalData) {
 		if (count <= 0) {
 			return;
 		}

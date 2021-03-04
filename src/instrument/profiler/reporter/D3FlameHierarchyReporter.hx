@@ -5,7 +5,7 @@ import haxe.macro.Context;
 import instrument.profiler.reporter.data.D3FlameNode;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
-import instrument.profiler.summary.HierarchyCallData;
+import instrument.profiler.summary.HierarchicalData;
 
 #if (sys || nodejs)
 #end
@@ -20,14 +20,14 @@ class D3FlameHierarchyReporter extends FileBaseReporter implements IProfilerRepo
 
 	public function startProfiler() {}
 
-	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
+	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchicalData) {
 		var d3Root:Null<D3FlameNode> = buildD3FlameData(root);
 		if (d3Root != null) {
 			outputFlame(d3Root.sure());
 		}
 	}
 
-	function buildD3FlameData(tree:HierarchyCallData):Null<D3FlameNode> {
+	function buildD3FlameData(tree:HierarchicalData):Null<D3FlameNode> {
 		if (tree == null) {
 			return null;
 		}

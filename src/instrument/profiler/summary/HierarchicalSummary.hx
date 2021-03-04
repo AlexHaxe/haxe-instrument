@@ -5,14 +5,14 @@ import haxe.Timer;
 class HierarchicalSummary implements ISummary {
 	var lock:Mutex;
 
-	var stack:Array<HierarchyCallData>;
+	var stack:Array<HierarchicalData>;
 	var startTime:Float;
 
-	public var root(default, null):HierarchyCallData;
+	public var root(default, null):HierarchicalData;
 
 	public function new(threadId:Int) {
 		lock = new Mutex();
-		root = new HierarchyCallData({
+		root = new HierarchicalData({
 			id: Profiler.nextId(),
 			threadId: threadId,
 			location: 'thread-$threadId',
@@ -40,8 +40,8 @@ class HierarchicalSummary implements ISummary {
 
 	public function enterFunction(data:CallData) {
 		lock.acquire();
-		var parent:HierarchyCallData = stack[stack.length - 1];
-		var child:HierarchyCallData = parent.addChild(data);
+		var parent:HierarchicalData = stack[stack.length - 1];
+		var child:HierarchicalData = parent.addChild(data);
 		stack.push(child);
 		child.increaseInvocations(data);
 		lock.release();
@@ -49,7 +49,7 @@ class HierarchicalSummary implements ISummary {
 
 	public function exitFunction(data:CallData) {
 		lock.acquire();
-		var current:HierarchyCallData = stack.pop().sure();
+		var current:HierarchicalData = stack.pop().sure();
 		current.addDuration(data);
 		lock.release();
 	}

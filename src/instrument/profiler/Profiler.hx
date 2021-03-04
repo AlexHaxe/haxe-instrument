@@ -6,7 +6,7 @@ import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
 import instrument.profiler.summary.FlatSummary;
 import instrument.profiler.summary.HierarchicalSummary;
-import instrument.profiler.summary.HierarchyCallData;
+import instrument.profiler.summary.HierarchicalData;
 import instrument.profiler.summary.ThreadSummaryContext;
 
 @:ignoreProfiler
@@ -165,7 +165,7 @@ class Profiler {
 		}
 
 		var summary:Array<CallSummaryData> = [];
-		var root:HierarchyCallData = new HierarchyCallData(null, null);
+		var root:HierarchicalData = new HierarchicalData(null, null);
 		var duration:Float = 0;
 		for (_ => ctx in threadContexts.sure()) {
 			root.addChildNode(ctx.hierarchicalSummary.root);

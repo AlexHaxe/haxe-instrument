@@ -2,7 +2,7 @@ package instrument.profiler.reporter;
 
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
-import instrument.profiler.summary.HierarchyCallData;
+import instrument.profiler.summary.HierarchicalData;
 
 class ConsoleDetailReporter implements IProfilerReporter {
 	var lock:Mutex;
@@ -13,7 +13,7 @@ class ConsoleDetailReporter implements IProfilerReporter {
 
 	public function startProfiler() {}
 
-	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {}
+	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchicalData) {}
 
 	public function enterFunction(data:CallData) {
 		output(">>> [" + data.id + "] " + data.location + ": " + data.className + "." + data.functionName);

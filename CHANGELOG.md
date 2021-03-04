@@ -6,6 +6,8 @@
 - added `-D instrument-quiet``conditional to skip printing dots during instrumentation
 - fixed exception in calcStatistic with empty coverage data
 - fixed handling of abstract constructors
+- fixed branch coverage with abstract op overload, fixes [#11](https://github.com/AlexHaxe/haxe-instrument/issues/11)
+- refactored call hierarchy data collection
 
 ## version 1.1.0 (2020-07-30)
 

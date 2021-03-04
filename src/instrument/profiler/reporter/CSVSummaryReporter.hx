@@ -4,7 +4,7 @@ import haxe.io.Path;
 import haxe.macro.Context;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
-import instrument.profiler.summary.HierarchyCallData;
+import instrument.profiler.summary.HierarchicalData;
 #if (sys || nodejs)
 import sys.FileSystem;
 import sys.io.File;
@@ -21,7 +21,7 @@ class CSVSummaryReporter extends FileBaseReporter implements IProfilerReporter {
 
 	public function startProfiler() {}
 
-	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
+	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchicalData) {
 		var lines:Array<String> = [];
 		lines.push("thread;invocations;total time in ms;class;function;location");
 		summary.sort(sortSummary);

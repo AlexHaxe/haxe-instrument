@@ -2,14 +2,14 @@ package instrument.profiler.reporter;
 
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
-import instrument.profiler.summary.HierarchyCallData;
+import instrument.profiler.summary.HierarchicalData;
 
 class ConsoleSummaryReporter implements IProfilerReporter {
 	public function new() {}
 
 	public function startProfiler() {}
 
-	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchyCallData) {
+	public function endProfiler(summary:Array<CallSummaryData>, root:HierarchicalData) {
 		output("");
 		output("==================");
 		output("== Call Summary ==");
