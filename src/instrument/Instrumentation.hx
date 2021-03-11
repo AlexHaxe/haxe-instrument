@@ -736,7 +736,7 @@ class Instrumentation {
 			{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(expr))}
 		]), pos: expr.pos};
 		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); _instrumentValue;}
-		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); false;}
+		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); cast false;}
 
 		var ifExpr:Expr = {expr: EIf(macro cast _instrumentValue, trueExpr, falseExpr), pos: expr.pos};
 		return {expr: EBlock([varExpr, ifExpr]), pos: expr.pos};
