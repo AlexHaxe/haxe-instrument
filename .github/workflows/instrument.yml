@@ -14,7 +14,7 @@ jobs:
   build:
     strategy:
       matrix:
-        haxe-version: ['4.1.5', '4.2.3', 'nightly']
+        haxe-version: ['4.2.4', 'nightly']
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -41,13 +41,11 @@ jobs:
         npx neko -version
         npx haxelib list
     - name: Run demo
-      if: matrix.haxe-version != '4.1.5'
       run: npx haxe build.hxml
     - name: Run self coverage
-      if: matrix.haxe-version != '4.1.5'
       run: npx haxe testSelfCoverage.hxml
     - name: Run tests
       run: npx haxe test.hxml
     - name: Upload results to codecov
-      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.2.3'
+      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.2.4'
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"

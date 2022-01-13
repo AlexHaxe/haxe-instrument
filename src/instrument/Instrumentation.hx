@@ -243,7 +243,8 @@ class Instrumentation {
 			case Coverage | Profiling | Both:
 		}
 		#if (!instrument_quiet)
-		Sys.print(".");
+		Sys.print(String.fromCharCode(0x8));
+		Sys.print(". ");
 		#end
 
 		var fields:Array<Field> = Context.getBuildFields();
@@ -732,9 +733,12 @@ class Instrumentation {
 		branchesInfo.addBranch(branchTrue);
 		branchesInfo.addBranch(branchFalse);
 
-		var varExpr:Expr = {expr: EVars([
-			{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(expr))}
-		]), pos: expr.pos};
+		var varExpr:Expr = {
+			expr: EVars([
+				{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(expr))}
+			]),
+			pos: expr.pos
+		};
 		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); _instrumentValue;}
 		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); cast false;}
 
@@ -942,8 +946,10 @@ class Instrumentation {
 	static function onGenerate(types:Array<Type>) {
 		var typeData:String = haxe.Json.stringify(Instrumentation.coverageContext.types);
 		Context.addResource(instrument.coverage.Coverage.RESOURCE_NAME, haxe.io.Bytes.ofString(typeData));
+		#if (!instrument_quiet)
 		Sys.println("");
 		Sys.println("");
+		#end
 	}
 	#end
 
