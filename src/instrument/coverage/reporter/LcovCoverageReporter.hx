@@ -134,7 +134,7 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		text.add("\n");
 
 		text.add("end_of_record\n\n");
-		appendCoverageFile(text.toString());
+		output(text.toString());
 	}
 
 	function makeBranchCoverage(types:Array<TypeInfo>):String {
