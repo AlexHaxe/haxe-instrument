@@ -1,8 +1,6 @@
 package instrument.profiler;
 
 import haxe.display.Position.Location;
-import haxe.macro.Compiler;
-import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.PositionTools;
 

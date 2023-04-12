@@ -13,8 +13,9 @@ class ExpectedCoverageData {
 		missedItems = [];
 	}
 
-	public function addMissing(line:Int, type:MissedCoverageType) {
+	public function addMissing(?fileName:String, line:Int, type:MissedCoverageType) {
 		missedItems.push({
+			fileName: fileName,
 			line: line,
 			missedType: missedTypeToString(type)
 		});
@@ -63,6 +64,7 @@ class ExpectedCoverageData {
 typedef ExpectedCoverageItem = {
 	var line:Int;
 	var missedType:String;
+	@:optional var fileName:String;
 }
 
 enum MissedCoverageType {

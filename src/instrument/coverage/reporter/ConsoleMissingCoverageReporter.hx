@@ -64,6 +64,7 @@ class ConsoleMissingCoverageReporter implements ICoverageReporter {
 			if (field.isCovered()) {
 				continue;
 			}
+			final fileName = field.location.substring(0, field.location.indexOf(":"));
 			addOutput(file, field.startLine, "field " + field.name + " not covered");
 		}
 
@@ -84,7 +85,8 @@ class ConsoleMissingCoverageReporter implements ICoverageReporter {
 				if (branch.isCovered()) {
 					continue;
 				}
-				addOutput(file, branch.startLine, "branch not covered");
+				final fileName = branch.location.substring(0, branch.location.indexOf(":"));
+				addOutput(fileName, branch.startLine, "branch not covered");
 			}
 		}
 	}
@@ -94,7 +96,8 @@ class ConsoleMissingCoverageReporter implements ICoverageReporter {
 			if (expression.isCovered()) {
 				continue;
 			}
-			addOutput(file, expression.startLine, "expression not covered");
+			final fileName = expression.location.substring(0, expression.location.indexOf(":"));
+			addOutput(fileName, expression.startLine, "expression not covered");
 		}
 	}
 

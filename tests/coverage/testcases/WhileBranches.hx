@@ -36,11 +36,26 @@ class WhileBranches implements ICoverageTestee {
 		doNothing();
 	}
 
+	public function whileLoopCount2() {
+		var i:Int = 0;
+		while (i++ < 10) {
+			if (i > 10) {
+				continue;
+			}
+			if (i > 0) {
+				doNothing();
+			}
+			doNothing();
+		}
+		doNothing();
+	}
+
 	function doNothing() {}
 
 	public function run() {
 		whileLoopTrue();
 		whileLoopFalse();
 		whileLoopCount();
+		whileLoopCount2();
 	}
 }

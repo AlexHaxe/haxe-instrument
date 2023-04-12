@@ -51,6 +51,45 @@ class CoverageContext {
 		return id++;
 	}
 
+	#if macro
+	public function findFileInfo(fileName:String):FileInfo {
+		for (file in files) {
+			if (fileName == file.file) {
+				return file;
+			}
+		}
+		var file = new FileInfo(fileName, fileName);
+		files.push(file);
+		return file;
+	}
+
+	public function findTypeInfo(fileName:String, startLine:Int, endLine:Int):TypeInfo {
+		var fileInfo = findFileInfo(fileName);
+		for (type in fileInfo.types) {
+			if (type.location.startsWith(fileName)) {
+				return type;
+			}
+		}
+		var newType = new TypeInfo(nextId(), fileName, "SomeMacro", fileName + ":" + startLine, fileName, startLine, endLine);
+		fileInfo.addType(newType);
+		addType(newType);
+		return newType;
+	}
+
+	public function findFieldInfo(fileName:String, startLine:Int, endLine:Int):FieldInfo {
+		var typeInfo:Null<TypeInfo> = findTypeInfo(fileName, startLine, endLine);
+		for (field in typeInfo.fields) {
+			if (field.startLine <= startLine && field.endLine >= endLine) {
+				return field;
+			}
+		}
+
+		var newField = new FieldInfo(nextId(), fileName, fileName + ":" + startLine, startLine, endLine);
+		typeInfo.addField(newField);
+		return newField;
+	}
+	#end
+
 	public static function contextFromJson():CoverageContext {
 		var context:CoverageContext = new CoverageContext();
 		var jsonTypes:Array<TypeInfoStruct> = Json.parse(haxe.Resource.getString(Coverage.RESOURCE_NAME));
@@ -58,6 +97,10 @@ class CoverageContext {
 			context.addType(TypeInfo.fromJson(type));
 		}
 		return context;
+	}
+
+	public static function logBranch(logId:Int) {
+		logExpression(logId);
 	}
 
 	public static function logExpression(logId:Int) {
@@ -69,7 +112,7 @@ class CoverageContext {
 		}
 		lock.sure().acquire();
 		#if debug_log_expression
-		trace("logExpression(" + logId + ")");
+		Sys.println(findLogId(logId));
 		#end
 		if (covered.sure().exists(logId)) {
 			covered.sure().set(logId, covered.sure().get(logId).sure() + 1);
@@ -78,6 +121,39 @@ class CoverageContext {
 		}
 		lock.sure().release();
 	}
+
+	#if debug_log_expression
+	static function findLogId(logId:Int) {
+		static var context:CoverageContext = contextFromJson();
+
+		for (type in context.types) {
+			if (type.id == logId) {
+				return '${type.location} [$logId - Type]';
+			}
+			for (field in type.fields) {
+				if (field.id == logId) {
+					return '${field.location} [$logId - Field]';
+				}
+				for (expr in field.expressions) {
+					if (expr.id == logId) {
+						return '${expr.location} ${expr.startLine}-${expr.endLine} [$logId - Expression]';
+					}
+				}
+				for (branch in field.branches) {
+					if (branch.id == logId) {
+						return '${branch.location} ${branch.startLine}-${branch.endLine} [$logId - Branch]';
+					}
+					for (singleBranch in branch.branches) {
+						if (singleBranch.id == logId) {
+							return '${singleBranch.location} ${singleBranch.startLine}-${singleBranch.endLine} [$logId - Branch]';
+						}
+					}
+				}
+			}
+		}
+		return '[$logId - Unknown]';
+	}
+	#end
 
 	public function calcStatistic() {
 		if (covered == null) {

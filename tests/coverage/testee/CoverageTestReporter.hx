@@ -14,7 +14,7 @@ class CoverageTestReporter extends ConsoleMissingCoverageReporter {
 
 		if (data.missedItems.length != outputLines.length) {
 			trace("number of missed items mismatch: " + data.missedItems.length + " != " + outputLines.length);
-			trace(outputLines.map(l -> '${l.lineNumber}: ${l.text}\n'));
+			trace(outputLines.map(l -> '${l.file}:${l.lineNumber} ${l.text}\n'));
 			trace(data.missedItems.map(l -> '${l.line}: ${l.missedType}\n'));
 			Sys.exit(-1);
 		}
@@ -22,6 +22,11 @@ class CoverageTestReporter extends ConsoleMissingCoverageReporter {
 			var found:Bool = false;
 			var text:String = '${item.missedType} not covered';
 			for (out in outputLines) {
+				if (item.fileName != null) {
+					if (out.file != item.fileName) {
+						continue;
+					}
+				}
 				if (out.lineNumber != item.line) {
 					continue;
 				}

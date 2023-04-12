@@ -86,15 +86,21 @@ class JaCoCoXmlCoverageReporter extends FileBaseReporter implements ICoverageRep
 
 	function addLineCoverage(file:FileInfo, fileXml:Xml) {
 		var lineInfo:Map<Int, JacocoLineCounters> = new Map<Int, JacocoLineCounters>();
+		final fileName = file.file;
+
 		for (type in file.types) {
 			for (field in type.fields) {
 				for (expression in field.expressions) {
-					for (line in expression.startLine...expression.endLine + 1) {
-						setLineCounterInstructions(lineInfo, line, 1, expression.isCovered() ? 1 : 0);
+					if (expression.location.startsWith(fileName)) {
+						for (line in expression.startLine...expression.endLine + 1) {
+							setLineCounterInstructions(lineInfo, line, 1, expression.isCovered() ? 1 : 0);
+						}
 					}
 				}
 				for (branches in field.branches) {
-					setLineCounterBranches(lineInfo, branches.startLine, branches.branchCount, branches.branchesCovered);
+					if (branches.location.startsWith(fileName)) {
+						setLineCounterBranches(lineInfo, branches.startLine, branches.branchCount, branches.branchesCovered);
+					}
 				}
 			}
 		}

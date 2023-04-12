@@ -80,29 +80,37 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		maxLineNumber = 0;
 		var lineCov:Map<Int, Int> = new Map<Int, Int>();
 		for (type in types) {
+			final fileName = type.location.substring(0, type.location.indexOf(":"));
+
 			for (field in type.fields) {
 				for (expr in field.expressions) {
-					for (line in expr.startLine...expr.endLine + 1) {
-						var count:Int = 0;
-						if (!lineCov.exists(line)) {
+					if (expr.location.startsWith(fileName)) {
+						for (line in expr.startLine...expr.endLine + 1) {
+							var count:Int = 0;
+							if (!lineCov.exists(line)) {
+								lineCov.set(line, expr.count);
+								continue;
+							}
+							count = lineCov.get(line).sure();
+							if (count <= expr.count) {
+								continue;
+							}
 							lineCov.set(line, expr.count);
-							continue;
 						}
-						count = lineCov.get(line).sure();
-						if (count <= expr.count) {
-							continue;
+						if (maxLineNumber < expr.endLine) {
+							maxLineNumber = expr.endLine;
 						}
-						lineCov.set(line, expr.count);
-					}
-					if (maxLineNumber < expr.endLine) {
-						maxLineNumber = expr.endLine;
 					}
 				}
 			}
 		}
 		for (type in types) {
+			final fileName = type.location.substring(0, type.location.indexOf(":"));
 			for (field in type.fields) {
 				for (branches in field.branches) {
+					if (!branches.location.startsWith(fileName)) {
+						continue;
+					}
 					for (branch in branches.branches) {
 						for (line in branch.startLine...branch.endLine + 1) {
 							lineCov.set(line, branch.count);
@@ -141,8 +149,13 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		var text:StringBuf = new StringBuf();
 		var lineCov:Map<Int, {block:Int, branch:Int, count:Int}> = new Map<Int, {block:Int, branch:Int, count:Int}>();
 		for (type in types) {
+			final fileName = type.location.substring(0, type.location.indexOf(":"));
+
 			for (field in type.fields) {
 				for (branches in field.branches) {
+					if (!branches.location.startsWith(fileName)) {
+						continue;
+					}
 					for (branch in branches.branches) {
 						var cov:{block:Int, branch:Int, count:Int} = {
 							block: branches.id,

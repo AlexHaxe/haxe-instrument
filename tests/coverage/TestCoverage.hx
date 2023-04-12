@@ -12,15 +12,18 @@ class TestCoverage implements ITest {
 	public function testIfBranches() {
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
 		data.addMissing(9, Branch);
+		data.addMissing(9, Expression);
 
 		data.addMissing(16, Branch);
+		data.addMissing(16, Expression);
 		data.addMissing(17, Expression);
 
 		data.addMissing(23, Branch);
+		data.addMissing(23, Expression);
 		data.addMissing(27, Expression);
 
-		data.addMissing(31, Expression);
 		data.addMissing(31, Branch);
+		data.addMissing(31, Expression);
 		data.addMissing(35, Expression);
 
 		data.addMissing(39, Branch);
@@ -38,6 +41,7 @@ class TestCoverage implements ITest {
 		data.addMissing(78, Expression);
 
 		data.addMissing(82, Branch);
+		data.addMissing(82, Expression);
 		data.addMissing(86, Expression);
 
 		data.save();
@@ -82,7 +86,14 @@ class TestCoverage implements ITest {
 		data.addMissing(19, Expression);
 
 		data.addMissing(31, Branch);
+		data.addMissing(31, Expression);
 		data.addMissing(32, Expression);
+
+		data.addMissing(42, Branch);
+		data.addMissing(42, Expression);
+		data.addMissing(43, Expression);
+		data.addMissing(45, Branch);
+		data.addMissing(45, Expression);
 		data.save();
 		runTestee("coverage.testcases.WhileBranches");
 	}
@@ -95,10 +106,63 @@ class TestCoverage implements ITest {
 		runTestee("coverage.testcases.TryCatch");
 	}
 
+	#if (haxe >= version("4.3.0"))
+	public function testTernaryBranches() {
+		var data:ExpectedCoverageData = new ExpectedCoverageData();
+		data.addMissing(20, Branch);
+		data.addMissing(21, Branch);
+		data.addMissing(23, Branch);
+		data.addMissing(24, Branch);
+		data.addMissing(25, Branch);
+
+		data.addMissing(32, Branch);
+		data.addMissing(33, Branch);
+		data.addMissing(33, Expression);
+		data.addMissing(35, Branch);
+		data.addMissing(35, Expression);
+		data.addMissing(36, Branch);
+		data.addMissing(36, Expression);
+		data.addMissing(37, Branch);
+		data.addMissing(37, Expression);
+
+		data.addMissing(47, Branch);
+		data.addMissing(48, Branch);
+		data.addMissing(49, Branch);
+
+		data.save();
+		runTestee("coverage.testcases.TernaryBranches");
+	}
+	#end
+
+	public function testWithMacroPositions() {
+		var data:ExpectedCoverageData = new ExpectedCoverageData();
+		data.addMissing(13, Field("appendMacroCode"));
+		data.addMissing(14, Expression);
+		data.addMissing("tests/coverage/testcases/macro/BuildMacro.hx", 12, Field("tests/coverage/testcases/macro/BuildMacro.hx"));
+		data.addMissing("tests/coverage/testcases/macro/BuildMacro.hx", 12, Expression);
+		data.addMissing("tests/coverage/testcases/macro/BuildMacro.hx", 13, Expression);
+		data.addMissing("tests/coverage/testcases/macro/BuildMacro.hx", 34, Field("macroFieldNotCovered"));
+		data.addMissing("tests/coverage/testcases/macro/BuildMacro.hx", 35, Expression);
+		data.save();
+		runTestee("coverage.testcases.WithMacroPositions");
+	}
+
 	function runTestee(testeeClass:String, ?pos:PosInfos) {
 		var params:Array<String> = [
-			"haxe", "-cp", "src", "-cp", "tests", "-lib", "safety", "-D", "test-class=" + testeeClass, "--macro",
-			'instrument.Instrumentation.coverage([\'$testeeClass\'],[\'tests\'],[])', "-main", "coverage.testee.CoverageTestMain", "--run",
+			"haxe",
+			"-cp",
+			"src",
+			"-cp",
+			"tests",
+			"-lib",
+			"safety",
+			"-D",
+			"test-class=" + testeeClass,
+			"--macro",
+			'instrument.Instrumentation.coverage([\'$testeeClass\'],[\'tests\'],[])',
+			"-main",
+			"coverage.testee.CoverageTestMain",
+			"--run",
 			"coverage.testee.CoverageTestMain"
 		];
 

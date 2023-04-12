@@ -1,4 +1,5 @@
 package instrument.coverage.reporter;
+
 import haxe.macro.Compiler;
 
 class CodecovCoverageReporter extends FileBaseReporter implements ICoverageReporter {
@@ -38,16 +39,23 @@ class CodecovCoverageReporter extends FileBaseReporter implements ICoverageRepor
 
 	function makeLineCoverage(file:FileInfo):Map<Int, String> {
 		var coverage:Map<Int, String> = new Map<Int, String>();
+		var fileName = file.file;
 
 		for (type in file.types) {
 			for (field in type.fields) {
 				for (branches in field.branches) {
+					if (!branches.location.startsWith(fileName)) {
+						continue;
+					}
 					if (branches.isCovered()) {
 						continue;
 					}
 					coverage.set(branches.startLine, '"${branches.branchesCovered}/${branches.branchCount}"');
 				}
 				for (expression in field.expressions) {
+					if (!expression.location.startsWith(fileName)) {
+						continue;
+					}
 					for (line in expression.startLine...expression.endLine + 1) {
 						if (coverage.exists(line)) {
 							continue;

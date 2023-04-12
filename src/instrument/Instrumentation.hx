@@ -407,13 +407,22 @@ class Instrumentation {
 	}
 
 	static function initFieldContext(field:Field) {
+		var typeFileName = context.typeInfo.location.substring(0, context.typeInfo.location.indexOf(":"));
+
 		var location:Location = PositionTools.toLocation(field.pos);
 		var fieldInfo:FieldInfo = new FieldInfo(coverageContext.nextId(), field.name, location.locationToString(), location.range.start.line,
 			location.range.end.line);
 		switch (context.level) {
 			case None | Profiling:
 			case Coverage | Both:
-				context.typeInfo.addField(fieldInfo);
+				if (fieldInfo.location.startsWith(typeFileName)) {
+					context.typeInfo.addField(fieldInfo);
+				} else {
+					var typeInfo = coverageContext.findTypeInfo(location.file.toString(), location.range.start.line, location.range.end.line);
+					if (typeInfo != null) {
+						typeInfo.addField(fieldInfo);
+					}
+				}
 		}
 		context.fieldInfo = fieldInfo;
 	}
@@ -434,19 +443,6 @@ class Instrumentation {
 		var exprs:Array<Expr> = exprsFromBlock(expr);
 		var location:Location = PositionTools.toLocation(context.pos);
 
-		var covExpr:Expr = macro instrument.coverage.CoverageContext.logExpression($v{context.fieldInfo.id});
-		if (withCoverage) {
-			exprs.unshift(covExpr);
-		}
-		if (withProfiler) {
-			var exit:Expr = macro instrument.profiler.Profiler.exitFunction(__profiler__id__);
-			var entry:Expr = macro var __profiler__id__:Int = instrument.profiler.Profiler.enterFunction($v{location.locationToString()},
-				$v{context.className}, $v{context.fieldName}, null);
-			exprs.unshift(entry);
-			if (!context.allReturns) {
-				exprs.push(exit);
-			}
-		}
 		var addNullReturn:Bool = !context.allReturns;
 		switch (context.field.kind) {
 			case FVar(t, e):
@@ -461,6 +457,19 @@ class Instrumentation {
 					default:
 				}
 			case FProp(get, set, t, e):
+		}
+		if (withCoverage) {
+			var covExpr:Expr = macro instrument.coverage.CoverageContext.logExpression($v{context.fieldInfo.id});
+			exprs.unshift(covExpr);
+		}
+		if (withProfiler) {
+			var exit:Expr = macro instrument.profiler.Profiler.exitFunction(__profiler__id__);
+			var entry:Expr = macro var __profiler__id__:Int = instrument.profiler.Profiler.enterFunction($v{location.locationToString()},
+				$v{context.className}, $v{context.fieldName}, null);
+			exprs.unshift(entry);
+			if (!context.allReturns) {
+				exprs.push(exit);
+			}
 		}
 		if (hadWithProfiler && addNullReturn) {
 			var nullReturn:Expr = macro return cast null;
@@ -498,25 +507,15 @@ class Instrumentation {
 
 			case EWhile(econd, e, normal):
 				var branchesInfo:BranchesInfo = makeBranchesInfo(econd);
-				econd = coverCondition(instrumentExpr(ensureBlockExpr(econd)), branchesInfo);
-				e = instrumentExpr(ensureBlockExpr(e));
-				return {expr: EWhile(econd, e, normal), pos: expr.pos};
+				coverWhileCondition(econd, e, normal, branchesInfo);
 
 			case EIf(cond, eif, eelse):
 				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
-				cond = coverBoolCondition(cond, branchesInfo);
-				eif = instrumentExpr(ensureBlockExpr(eif));
-				if (eelse != null) {
-					eelse = instrumentExpr(ensureBlockExpr(eelse));
-				}
-				{expr: EIf(cond, eif, eelse), pos: expr.pos};
+				coverIfCondition(cond, eif, eelse, branchesInfo);
 
 			case ETernary(cond, eif, eelse):
 				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
-				cond = coverBoolCondition(cond, branchesInfo);
-				eif = instrumentExpr(ensureBlockExpr(eif));
-				eelse = instrumentExpr(ensureBlockExpr(eelse));
-				{expr: ETernary(cond, eif, eelse), pos: expr.pos};
+				coverTernaryCondition(cond, eif, eelse, branchesInfo);
 
 			case EFunction(kind, f):
 				if (f.expr == null) {
@@ -545,6 +544,13 @@ class Instrumentation {
 					return {expr: EReturn(e), pos: Context.currentPos()};
 				}
 				replaceReturn(e);
+			case ETry(e, catches):
+				e = instrumentExpr(ensureBlockExpr(e));
+				for (c in catches) {
+					c.expr = instrumentExpr(ensureBlockExpr(c.expr));
+				}
+
+				{expr: ETry(e, catches), pos: expr.pos};
 
 			case EThrow(e):
 				if (context.isInline) {
@@ -558,7 +564,7 @@ class Instrumentation {
 			case ECall(e, params):
 				var instumentedExpr:Expr = expr.map(instrumentExpr);
 				switch (e.expr) {
-					case EField(e, field):
+					case #if (haxe >= version("4.3.0")) EField(e, field, kind) #else EField(e, field) #end:
 						if (field == "exit") {
 							switch (e.expr) {
 								case EConst(CIdent(s)):
@@ -608,16 +614,25 @@ class Instrumentation {
 						var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
 						e1 = coverBoolCondition(e1, branchesInfo);
 						e2 = coverBoolCondition(e2, branchesInfo);
-						return {expr: EBinop(op, e1, e2), pos: expr.pos};
+						{expr: EBinop(op, e1, e2), pos: expr.pos};
 					case OpEq | OpNotEq | OpGt | OpGte | OpLt | OpLte:
 						var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
 						e1 = instrumentExpr(ensureBlockExpr(e1));
 						e2 = instrumentExpr(ensureBlockExpr(e2));
-						return coverCondition({expr: EBinop(op, e1, e2), pos: expr.pos}, branchesInfo);
+						coverCondition({expr: EBinop(op, e1, e2), pos: expr.pos}, branchesInfo);
+					#if (haxe >= version("4.3.0"))
+					case OpNullCoal:
+						var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
+						coverNullCoal(e1, e2, branchesInfo);
+					#end
 					default:
+						expr.map(instrumentExpr);
 				}
-				expr.map(instrumentExpr);
-
+			#if (haxe >= version("4.3.0"))
+			case EField(e, field, Safe):
+				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
+				coverSafeField(e, field, branchesInfo);
+			#end
 			default:
 				expr.map(instrumentExpr);
 		}
@@ -631,21 +646,29 @@ class Instrumentation {
 				var location:Location = PositionTools.toLocation(expr.pos);
 				var entry:Expr = macro var __profiler__id__:Int = instrument.profiler.Profiler.enterFunction($v{location.locationToString()},
 					$v{context.className}, $v{name}, null);
-				exprs.unshift(entry);
+				exprs.unshift(relocateExpr(entry, expr.pos));
 				if (!allReturn) {
 					var exit:Expr = macro instrument.profiler.Profiler.exitFunction(__profiler__id__);
-					exprs.push(exit);
+					exprs.push(relocateExpr(exit, expr.pos));
 				}
 		}
 		return {expr: EBlock(exprs), pos: expr.pos};
 	}
 
 	static function logExpression(expr:Expr):Expr {
+		var fieldFileName = context.fieldInfo.location.substring(0, context.fieldInfo.location.indexOf(":"));
+
 		var location:Location = PositionTools.toLocation(expr.pos);
 		var expressionInfo:ExpressionInfo = new ExpressionInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line,
 			location.range.end.line);
-		context.fieldInfo.addExpression(expressionInfo);
-		return macro instrument.coverage.CoverageContext.logExpression($v{expressionInfo.id});
+
+		if (location.file.toString() == fieldFileName) {
+			context.fieldInfo.addExpression(expressionInfo);
+		} else {
+			var fieldInfo = coverageContext.findFieldInfo(location.file.toString(), location.range.start.line, location.range.end.line);
+			fieldInfo.addExpression(expressionInfo);
+		}
+		return relocateExpr(macro instrument.coverage.CoverageContext.logExpression($v{expressionInfo.id}), expr.pos);
 	}
 
 	static function makeBlock(expr:Expr):Expr {
@@ -664,7 +687,7 @@ class Instrumentation {
 	static function ensureBlockValueExpr(expr:Expr):Expr {
 		return switch (expr.expr) {
 			case EBlock([]):
-				makeBlock(expr); // this is not an "empty block", it's a empty object declaration.
+				makeBlock(expr); // this is not an "empty block", it's an empty object declaration.
 			case EBlock(_):
 				expr;
 			default:
@@ -682,11 +705,18 @@ class Instrumentation {
 	}
 
 	static function makeBranchesInfo(expr:Expr):BranchesInfo {
+		var fieldFileName = context.fieldInfo.location.substring(0, context.fieldInfo.location.indexOf(":"));
+
 		var location:Location = PositionTools.toLocation(expr.pos);
 		var branchesInfo:BranchesInfo = new BranchesInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line,
 			location.range.end.line);
 
-		context.fieldInfo.addBranches(branchesInfo);
+		if (location.file.toString() == fieldFileName) {
+			context.fieldInfo.addBranches(branchesInfo);
+		} else {
+			var fieldInfo = coverageContext.findFieldInfo(location.file.toString(), location.range.start.line, location.range.end.line);
+			fieldInfo.addBranches(branchesInfo);
+		}
 		return branchesInfo;
 	}
 
@@ -705,10 +735,10 @@ class Instrumentation {
 			new BranchInfo(coverageContext.nextId(), branchesInfo.location, branchesInfo.startLine, branchesInfo.endLine);
 		} else {
 			var location:Location = PositionTools.toLocation(expr.pos);
-			new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+			new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.start.line);
 		}
 		branchesInfo.addBranch(branchInfo);
-		var covExpr:Expr = macro instrument.coverage.CoverageContext.logExpression($v{branchInfo.id});
+		var covExpr:Expr = macro instrument.coverage.CoverageContext.logBranch($v{branchInfo.id});
 
 		if (expr == null) {
 			return covExpr;
@@ -739,11 +769,158 @@ class Instrumentation {
 			]),
 			pos: expr.pos
 		};
-		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); _instrumentValue;}
-		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); cast false;}
+		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}); _instrumentValue;}
+		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}); cast false;}
 
 		var ifExpr:Expr = {expr: EIf(macro cast _instrumentValue, trueExpr, falseExpr), pos: expr.pos};
 		return {expr: EBlock([varExpr, ifExpr]), pos: expr.pos};
+	}
+
+	static function coverWhileCondition(cond:Expr, bodyExpr:Expr, normalWhile:Bool, branchesInfo:BranchesInfo):Expr {
+		switch (context.level) {
+			case None | Profiling:
+				cond = {expr: EBlock(exprsFromBlock(cond)), pos: cond.pos};
+				bodyExpr = {expr: EBlock(exprsFromBlock(bodyExpr)), pos: bodyExpr.pos};
+				return {expr: EWhile(cond, bodyExpr, normalWhile), pos: cond.pos};
+			case Coverage:
+			case Both:
+		}
+		var location:Location = PositionTools.toLocation(cond.pos);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
+
+		bodyExpr = instrumentExpr(ensureBlockExpr(bodyExpr));
+
+		var varExpr:Expr = {
+			expr: EVars([
+				{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(cond))}
+			]),
+			pos: cond.pos
+		};
+		var trueExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
+				},
+				macro true
+			]),
+			pos: cond.pos
+		}
+		var falseExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
+				},
+				macro false
+			]),
+			pos: cond.pos
+		}
+		var ifExpr:Expr = {expr: EIf(macro cast _instrumentValue, trueExpr, falseExpr), pos: cond.pos};
+		var condBlock = {expr: EBlock([varExpr, ifExpr]), pos: cond.pos};
+		return {expr: EWhile(condBlock, bodyExpr, normalWhile), pos: cond.pos};
+	}
+
+	static function coverIfCondition(cond:Expr, ifExpr:Expr, elseExpr:Null<Expr>, branchesInfo:BranchesInfo):Expr {
+		switch (context.level) {
+			case None | Profiling:
+				cond = {expr: EBlock(exprsFromBlock(cond)), pos: cond.pos};
+				ifExpr = {expr: EBlock(exprsFromBlock(ifExpr)), pos: ifExpr.pos};
+				if (elseExpr != null) {
+					elseExpr = {expr: EBlock(exprsFromBlock(elseExpr)), pos: elseExpr.pos};
+				}
+
+				return {expr: EIf(cond, ifExpr, elseExpr), pos: cond.pos};
+			case Coverage:
+			case Both:
+		}
+		var location:Location = PositionTools.toLocation(cond.pos);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
+
+		ifExpr = instrumentExpr(ensureBlockExpr(ifExpr));
+		if (elseExpr == null) {
+			elseExpr = {expr: EConst(CIdent("null")), pos: cond.pos};
+		} else {
+			elseExpr = instrumentExpr(ensureBlockExpr(elseExpr));
+		}
+		var varExpr:Expr = {
+			expr: EVars([
+				{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(cond))}
+			]),
+			pos: cond.pos
+		};
+		var trueExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
+				},
+				logExpression(ifExpr),
+				ifExpr
+			]),
+			pos: ifExpr.pos
+		}
+		var falseExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
+				},
+				logExpression(elseExpr),
+				elseExpr
+			]),
+			pos: elseExpr.pos
+		}
+		var ifExpr:Expr = {expr: EIf(macro cast _instrumentValue, trueExpr, falseExpr), pos: cond.pos};
+		return {expr: EBlock([varExpr, ifExpr]), pos: cond.pos};
+	}
+
+	static function coverTernaryCondition(cond:Expr, ifExpr:Expr, elseExpr:Expr, branchesInfo:BranchesInfo):Expr {
+		switch (context.level) {
+			case None | Profiling:
+				cond = {expr: EBlock(exprsFromBlock(cond)), pos: cond.pos};
+				ifExpr = {expr: EBlock(exprsFromBlock(ifExpr)), pos: ifExpr.pos};
+				elseExpr = {expr: EBlock(exprsFromBlock(elseExpr)), pos: elseExpr.pos};
+
+				return {expr: ETernary(cond, ifExpr, elseExpr), pos: cond.pos};
+			case Coverage:
+			case Both:
+		}
+		var location:Location = PositionTools.toLocation(cond.pos);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
+
+		var varExpr:Expr = {
+			expr: EVars([
+				{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(cond))}
+			]),
+			pos: cond.pos
+		};
+		var trueExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
+				},
+				ifExpr
+			]),
+			pos: ifExpr.pos
+		}
+		var falseExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
+				},
+				elseExpr
+			]),
+			pos: elseExpr.pos
+		}
+
+		var ternaryExpr:Expr = {expr: ETernary(macro cast _instrumentValue, trueExpr, falseExpr), pos: cond.pos};
+		return {expr: EBlock([varExpr, ternaryExpr]), pos: cond.pos};
 	}
 
 	static function coverCondition(expr:Expr, branchesInfo:BranchesInfo):Expr {
@@ -759,11 +936,103 @@ class Instrumentation {
 		branchesInfo.addBranch(branchTrue);
 		branchesInfo.addBranch(branchFalse);
 
-		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchTrue.id}); true;}
-		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logExpression($v{branchFalse.id}); false;}
+		var trueExpr:Expr = macro {instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}); true;}
+		var falseExpr:Expr = macro {instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}); false;}
 
 		return {expr: EIf(expr, trueExpr, falseExpr), pos: expr.pos};
 	}
+
+	#if (haxe >= version("4.3.0"))
+	static function coverNullCoal(exprLeft:Expr, exprRight:Expr, branchesInfo:BranchesInfo):Expr {
+		switch (context.level) {
+			case None | Profiling:
+				exprLeft = {expr: EBlock(exprsFromBlock(exprLeft)), pos: exprLeft.pos};
+				exprRight = {expr: EBlock(exprsFromBlock(exprRight)), pos: exprRight.pos};
+				return {expr: EBinop(OpNullCoal, exprLeft, exprRight), pos: exprLeft.pos};
+			case Coverage:
+			case Both:
+		}
+		var location:Location = PositionTools.toLocation(exprLeft.pos);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
+
+		var varExpr:Expr = {
+			expr: EVars([
+				{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(exprLeft))}
+			]),
+			pos: exprLeft.pos
+		};
+		var condExpr:Expr = {
+			expr: EBinop(OpNotEq, {expr: EConst(CIdent("_instrumentValue")), pos: exprLeft.pos}, {expr: EConst(CIdent("null")), pos: exprLeft.pos}),
+			pos: exprLeft.pos
+		};
+
+		var trueExpr:Expr = macro {
+			instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
+			_instrumentValue;
+		}
+		var falseExpr:Expr = {
+			expr: EBlock([
+				macro {
+					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
+				},
+				logExpression(exprRight),
+				exprRight
+			]),
+			pos: exprRight.pos
+		}
+
+		var ifExpr:Expr = {expr: EIf(condExpr, trueExpr, falseExpr), pos: exprLeft.pos};
+		return {expr: EBlock([varExpr, ifExpr]), pos: exprLeft.pos};
+	}
+
+	static function coverSafeField(expr:Expr, field:String, branchesInfo:BranchesInfo):Expr {
+		switch (context.level) {
+			case None | Profiling:
+				expr = {expr: EBlock(exprsFromBlock(expr)), pos: expr.pos};
+				return {expr: EField(expr, field, Safe), pos: expr.pos};
+			case Coverage:
+			case Both:
+		}
+
+		var location:Location = PositionTools.toLocation(expr.pos);
+		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTrue);
+		branchesInfo.addBranch(branchFalse);
+
+		var fieldAccess = instrumentExpr(ensureBlockExpr(expr));
+		var varExpr:Expr = {
+			expr: EVars([{name: "_instrumentValue", type: null, expr: fieldAccess}]),
+			pos: expr.pos
+		};
+		var condExpr:Expr = {
+			expr: EBinop(OpNotEq, {expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}, {expr: EConst(CIdent("null")), pos: expr.pos}),
+			pos: expr.pos
+		};
+
+		var trueExpr:Expr = {
+			expr: EBlock([
+				macro {instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});},
+				{expr: EField({expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}, field, Normal), pos: expr.pos}
+			]),
+			pos: expr.pos
+		};
+		var falseExpr:Expr = macro {
+			instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
+			null;
+		};
+
+		var ifExpr:Expr = {
+			expr: ECast({expr: EIf(condExpr, trueExpr, falseExpr), pos: expr.pos}, null),
+			pos: expr.pos
+		};
+
+		return {expr: EBlock([varExpr, ifExpr]), pos: expr.pos};
+	}
+	#end
 
 	static function hasAllReturns(expr:Expr):Bool {
 		if ((expr == null) || (expr.expr == null)) {
@@ -822,22 +1091,22 @@ class Instrumentation {
 			case Both:
 		}
 		if (expr == null) {
-			return (macro {
+			return relocateExpr(macro {
 				instrument.profiler.Profiler.exitFunction(__profiler__id__);
 				return;
-			});
+			}, expr.pos);
 		}
 		if ((context.fieldName == "new") || (context.fieldName == "_new")) {
-			return (macro {
+			return relocateExpr(macro {
 				instrument.profiler.Profiler.exitFunction(__profiler__id__);
 				return $expr;
-			});
+			}, expr.pos);
 		}
-		return (macro {
+		return relocateExpr(macro {
 			var result = ${instrumentExpr(expr)};
 			instrument.profiler.Profiler.exitFunction(__profiler__id__);
 			return cast result;
-		});
+		}, expr.pos);
 	}
 
 	static function replaceThrow(expr:Expr):Expr {
@@ -941,6 +1210,11 @@ class Instrumentation {
 				}
 			case FProp(get, set, t, e):
 		}
+	}
+
+	static function relocateExpr(expr:Expr, pos:Position):Expr {
+		expr.pos = pos;
+		return expr.map((e) -> relocateExpr(e, pos));
 	}
 
 	static function onGenerate(types:Array<Type>) {

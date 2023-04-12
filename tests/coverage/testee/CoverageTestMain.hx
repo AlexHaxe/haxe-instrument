@@ -8,6 +8,10 @@ import coverage.testcases.MissingFields;
 import coverage.testcases.SwitchBranches;
 import coverage.testcases.TryCatch;
 import coverage.testcases.WhileBranches;
+import coverage.testcases.WithMacroPositions;
+#if (haxe >= version("4.3.0"))
+import coverage.testcases.TernaryBranches;
+#end
 
 class CoverageTestMain {
 	final includeTestCases:Array<() -> ICoverageTestee> = [
@@ -15,7 +19,11 @@ class CoverageTestMain {
 		IgnoredCoverage.new,
 		MissingFields.new,
 		SwitchBranches.new,
+		#if (haxe >= version("4.3.0"))
+		TernaryBranches.new,
+		#end
 		TryCatch.new,
+		WithMacroPositions.new,
 		WhileBranches.new
 	];
 
