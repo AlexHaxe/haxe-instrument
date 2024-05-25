@@ -11,6 +11,7 @@ typedef InstrumentationContext = {
 	var typeInfo:Null<TypeInfo>;
 	var anonFuncCounter:Int;
 	var isInline:Bool;
+	var implicitReturn:Bool;
 	var isAbstract:Bool;
 	var allReturns:Bool;
 	var missingBranches:Array<Expr>;
