@@ -370,22 +370,7 @@ class Instrumentation {
 		if (!context.isInline) {
 			return true;
 		}
-		switch (expr.expr) {
-			case EBlock(exprs):
-				for (childExpr in exprs) {
-					switch (childExpr.expr) {
-						case EBinop(OpAssign, e1, _) | EBinop(OpAssignOp(_), e1, _):
-							switch (e1.expr) {
-								case EConst(CIdent("this")):
-									return false;
-								default:
-							}
-						default:
-					}
-				}
-			default:
-		}
-		return true;
+		return false;
 	}
 
 	static function initContext(field:Field) {
