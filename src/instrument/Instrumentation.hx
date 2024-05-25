@@ -292,6 +292,7 @@ class Instrumentation {
 			typeInfo: typeInfo,
 			anonFuncCounter: 0,
 			isInline: false,
+			implicitReturn: false,
 			isAbstract: false,
 			allReturns: false,
 			level: typeLevel,
@@ -579,6 +580,12 @@ class Instrumentation {
 			case EMeta(s, e):
 				if (s.name == ":inline") {
 					return e;
+				}
+				if (s.name == ":implicitReturn") {
+					context.implicitReturn = true;
+					var expr = instrumentExpr(e);
+					context.implicitReturn = false;
+					return expr;
 				}
 				expr.map(instrumentExpr);
 
@@ -1137,10 +1144,39 @@ class Instrumentation {
 				return $expr;
 			}, expr.pos);
 		}
+		switch (expr.expr) {
+			case EObjectDecl(fields):
+				if (context.implicitReturn) {
+					return relocateExpr(macro {
+						var result = ${instrumentExpr(expr)};
+						instrument.profiler.Profiler.exitFunction(__profiler__id__);
+						@:implicitReturn return result;
+					}, expr.pos);
+				}
+				return relocateExpr(macro {
+					var result = ${instrumentExpr(expr)};
+					instrument.profiler.Profiler.exitFunction(__profiler__id__);
+					return cast result;
+				}, expr.pos);
+			case EThrow(e):
+				return relocateExpr(macro {
+					var result = (${instrumentExpr(e)});
+					instrument.profiler.Profiler.exitFunction(__profiler__id__);
+					@:implicitReturn return throw result;
+				}, expr.pos);
+			case _:
+		}
+		if (context.implicitReturn) {
+			return relocateExpr(macro {
+				instrument.profiler.Profiler.exitFunction(__profiler__id__);
+				@:implicitReturn return (${instrumentExpr(expr)});
+			}, expr.pos);
+		}
+
 		return relocateExpr(macro {
 			var result = ${instrumentExpr(expr)};
 			instrument.profiler.Profiler.exitFunction(__profiler__id__);
-			return cast result;
+			return result;
 		}, expr.pos);
 	}
 
@@ -1151,11 +1187,12 @@ class Instrumentation {
 			case Profiling:
 			case Both:
 		}
-		return (macro {
-			var result = ${instrumentExpr(expr)};
+
+		return relocateExpr(macro {
+			var result = (${instrumentExpr(expr)});
 			instrument.profiler.Profiler.exitFunction(__profiler__id__);
 			throw result;
-		});
+		}, expr.pos);
 	}
 
 	static function replaceSysExit(expr:Expr):Expr {
