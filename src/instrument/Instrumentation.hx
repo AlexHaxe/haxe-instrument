@@ -527,12 +527,6 @@ class Instrumentation {
 				{expr: EFunction(kind, f), pos: expr.pos};
 
 			case EReturn(e):
-				if (context.isInline) {
-					if (e != null) {
-						// e = instrumentExpr(ensureBlockExpr(e));
-					}
-					return {expr: EReturn(e), pos: Context.currentPos()};
-				}
 				replaceReturn(e);
 			case ETry(e, catches):
 				e = instrumentExpr(ensureBlockExpr(e));
@@ -543,12 +537,6 @@ class Instrumentation {
 				{expr: ETry(e, catches), pos: expr.pos};
 
 			case EThrow(e):
-				if (context.isInline) {
-					if (e != null) {
-						e = instrumentExpr(ensureBlockExpr(e));
-					}
-					return {expr: EThrow(e), pos: expr.pos};
-				}
 				replaceThrow(e);
 
 			case ECall(e, params):
