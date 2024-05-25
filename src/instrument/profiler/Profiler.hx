@@ -21,6 +21,8 @@ class Profiler {
 	static var threads:Null<Array<Thread>>;
 	static var threadContexts:Null<Map<Int, ThreadSummaryContext>>;
 
+	static var lastExits:Null<Map<Int, CallData>>;
+
 	static function getThreadContext():ThreadSummaryContext {
 		var context:Null<ThreadSummaryContext> = null;
 
@@ -99,8 +101,13 @@ class Profiler {
 		if (pendingCalls == null) {
 			pendingCalls = new Map<String, CallData>();
 		}
+		if (lastExits == null) {
+			lastExits = new Map<Int, CallData>();
+		}
+		commitLastCallData(context);
 
 		pendingCalls.sure().set('$newId', data);
+
 		for (s in [context.flatSummary, context.hierarchicalSummary]) {
 			s.enterFunction(data);
 		}
@@ -135,14 +142,40 @@ class Profiler {
 		if (data != null) {
 			data.endTime = Timer.stamp();
 		}
-		pendingCalls.sure().remove('$id');
+		commitLastCallData(context);
+		lastExits.set(context.threadId, data);
 		lock.sure().release();
-		for (s in [context.flatSummary, context.hierarchicalSummary]) {
-			s.exitFunction(data);
+		context.itsMe = false;
+	}
+
+	public static function cancelExitFunction(id:Int) {
+		var context:ThreadSummaryContext = getThreadContext();
+		if (context == null) {
+			return;
 		}
-		for (r in reporter.sure()) {
-			r.exitFunction(data);
+		if (context.itsMe) {
+			return;
 		}
+		if (completed) {
+			return;
+		}
+		context.itsMe = true;
+		lock.sure().acquire();
+
+		var lastCalldata:Null<CallData> = lastExits.get(context.threadId);
+		if (lastCalldata == null) {
+			lock.sure().release();
+			context.itsMe = false;
+			return;
+		}
+		if (lastCalldata.id == id) {
+			lastExits.remove(context.threadId);
+			context.itsMe = false;
+			lock.sure().release();
+			return;
+		}
+		commitLastCallData(context);
+		lock.sure().release();
 		context.itsMe = false;
 	}
 
@@ -159,6 +192,7 @@ class Profiler {
 
 		for (threadId => ctx in threadContexts.sure()) {
 			ctx.itsMe = true;
+			commitLastCallData(ctx);
 			for (s in [ctx.flatSummary, ctx.hierarchicalSummary]) {
 				s.endProfiler();
 			}
@@ -183,6 +217,21 @@ class Profiler {
 			ctx.itsMe = false;
 		}
 		completed = false;
+	}
+
+	static function commitLastCallData(context:ThreadSummaryContext) {
+		var lastCalldata:Null<CallData> = lastExits.get(context.threadId);
+		if (lastCalldata == null) {
+			return;
+		}
+		pendingCalls.sure().remove('$lastCalldata.id');
+		for (s in [context.flatSummary, context.hierarchicalSummary]) {
+			s.exitFunction(lastCalldata);
+		}
+		for (r in reporter.sure()) {
+			r.exitFunction(lastCalldata);
+		}
+		lastExits.remove(context.threadId);
 	}
 
 	public static function nextId():Int {
