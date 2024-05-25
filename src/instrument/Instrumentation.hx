@@ -831,12 +831,16 @@ class Instrumentation {
 		branchesInfo.addBranch(branchTrue);
 		branchesInfo.addBranch(branchFalse);
 
-		ifExpr = instrumentExpr(ensureBlockExpr(ifExpr));
+		var ifReturnNoElse:Bool = false;
 		if (elseExpr == null) {
+			if (hasAllReturns(ifExpr)) {
+				ifReturnNoElse = true;
+			}
 			elseExpr = {expr: EConst(CIdent("null")), pos: cond.pos};
 		} else {
 			elseExpr = instrumentExpr(ensureBlockExpr(elseExpr));
 		}
+		ifExpr = instrumentExpr(ensureBlockExpr(ifExpr));
 		var varExpr:Expr = {
 			expr: EVars([
 				{name: "_instrumentValue", type: null, expr: instrumentExpr(ensureBlockExpr(cond))}
@@ -844,27 +848,25 @@ class Instrumentation {
 			pos: cond.pos
 		};
 		var trueExpr:Expr = {
-			expr: EBlock([
-				macro {
-					instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
-				},
-				logExpression(ifExpr),
-				ifExpr
-			]),
+			expr: EBlock(addExprOrBlock(ifExpr, [
+				macro instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}),
+				logExpression(ifExpr)
+			])),
 			pos: ifExpr.pos
-		}
-		var falseExpr:Expr = {
-			expr: EBlock([
-				macro {
-					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
-				},
-				logExpression(elseExpr),
-				elseExpr
-			]),
+		};
+		var falseExpr:Expr = if (ifReturnNoElse) null else {
+			expr: EBlock(addExprOrBlock(elseExpr, [
+				macro instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}),
+				logExpression(elseExpr)
+			])),
 			pos: elseExpr.pos
-		}
+		};
 		var ifExpr:Expr = {expr: EIf(macro cast _instrumentValue, trueExpr, falseExpr), pos: cond.pos};
-		return {expr: EBlock([varExpr, ifExpr]), pos: cond.pos};
+		var exprs:Array<Expr> = [varExpr, ifExpr];
+		if (ifReturnNoElse) {
+			exprs.push(macro instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}));
+		}
+		return {expr: EBlock(exprs), pos: cond.pos};
 	}
 
 	static function coverTernaryCondition(cond:Expr, ifExpr:Expr, elseExpr:Expr, branchesInfo:BranchesInfo):Expr {
@@ -1106,6 +1108,8 @@ class Instrumentation {
 				true;
 			case EThrow(e):
 				true;
+			case EMeta(s, e):
+				hasAllReturns(e);
 			default:
 				false;
 		}
