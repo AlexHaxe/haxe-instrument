@@ -5,8 +5,8 @@ import instrument.profiler.reporter.IProfilerReporter;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
 import instrument.profiler.summary.FlatSummary;
-import instrument.profiler.summary.HierarchicalSummary;
 import instrument.profiler.summary.HierarchicalData;
+import instrument.profiler.summary.HierarchicalSummary;
 import instrument.profiler.summary.ThreadSummaryContext;
 
 @:ignoreProfiler
@@ -126,7 +126,7 @@ class Profiler {
 		}
 		context.itsMe = true;
 		lock.sure().acquire();
-		var data:CallData = pendingCalls.sure().get('$id').sure();
+		var data:Null<CallData> = pendingCalls.sure().get('$id').sure();
 		if (data == null) {
 			context.itsMe = false;
 			lock.sure().release();
