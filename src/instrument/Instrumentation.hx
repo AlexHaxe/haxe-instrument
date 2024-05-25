@@ -317,12 +317,12 @@ class Instrumentation {
 				removeNullSafety(field);
 				context.allReturns = hasAllReturns(fun.expr);
 				#if debug_instrumentation
-				trace(BEFORE + fun.expr.toString());
+				Sys.println(debugPosition(field.pos) + BEFORE + fun.expr.toString());
 				#end
 				fun.expr = instrumentExpr(ensureBlockExpr(fun.expr));
 				fun.expr = instrumentFieldExpr(fun.expr, true, isMain);
 				#if debug_instrumentation
-				trace(AFTER + fun.expr.toString());
+				Sys.println(debugPosition(field.pos) + AFTER + fun.expr.toString());
 				#end
 			case FVar(type, expr) if (expr != null):
 				if (context.isAbstract || context.isInline) {
@@ -331,12 +331,12 @@ class Instrumentation {
 				initFieldContext(field);
 				removeNullSafety(field);
 				#if debug_instrumentation
-				trace(BEFORE + expr.toString());
+				Sys.println(debugPosition(field.pos) + BEFORE + expr.toString());
 				#end
 				expr = instrumentExpr(ensureBlockValueExpr(expr));
 				expr = instrumentFieldExpr(expr, false, false);
 				#if debug_instrumentation
-				trace(AFTER + expr.toString());
+				Sys.println(debugPosition(field.pos) + AFTER + expr.toString());
 				#end
 				field.kind = FVar(type, expr);
 			case FProp(get, set, type, expr) if (expr != null):
@@ -346,16 +346,21 @@ class Instrumentation {
 				initFieldContext(field);
 				removeNullSafety(field);
 				#if debug_instrumentation
-				trace(BEFORE + expr.toString());
+				Sys.println(debugPosition(field.pos) + BEFORE + expr.toString());
 				#end
 				expr = instrumentExpr(ensureBlockValueExpr(expr));
 				expr = instrumentFieldExpr(expr, false, false);
 				#if debug_instrumentation
-				trace(AFTER + expr.toString());
+				Sys.println(debugPosition(field.pos) + AFTER + expr.toString());
 				#end
 				field.kind = FProp(get, set, type, expr);
 			default:
 		}
+	}
+
+	static function debugPosition(p:Position):String {
+		var loc = PositionTools.toLocation(p);
+		return '${loc.file}:${loc.range.start.line}: ';
 	}
 
 	static function canRemoveInline(expr:Expr):Bool {
