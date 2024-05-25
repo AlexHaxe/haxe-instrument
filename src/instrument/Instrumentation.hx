@@ -359,10 +359,12 @@ class Instrumentation {
 		}
 	}
 
+	#if debug_instrumentation
 	static function debugPosition(p:Position):String {
 		var loc = PositionTools.toLocation(p);
 		return '${loc.file}:${loc.range.start.line}: ';
 	}
+	#end
 
 	static function canRemoveInline(expr:Expr):Bool {
 		if (!context.isAbstract) {
@@ -529,13 +531,7 @@ class Instrumentation {
 			case EReturn(e):
 				replaceReturn(e);
 			case ETry(e, catches):
-				e = instrumentExpr(ensureBlockExpr(e));
-				for (c in catches) {
-					c.expr = instrumentExpr(ensureBlockExpr(c.expr));
-				}
-
-				{expr: ETry(e, catches), pos: expr.pos};
-
+				replaceTry(e, catches);
 			case EThrow(e):
 				replaceThrow(e);
 
@@ -798,18 +794,14 @@ class Instrumentation {
 		};
 		var trueExpr:Expr = {
 			expr: EBlock([
-				macro {
-					instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
-				},
+				macro instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}),
 				macro true
 			]),
 			pos: cond.pos
 		}
 		var falseExpr:Expr = {
 			expr: EBlock([
-				macro {
-					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
-				},
+				macro instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}),
 				macro false
 			]),
 			pos: cond.pos
@@ -1178,6 +1170,52 @@ class Instrumentation {
 			instrument.profiler.Profiler.exitFunction(__profiler__id__);
 			return result;
 		}, expr.pos);
+	}
+
+	static function replaceTry(expr:Expr, catches:Array<Catch>):Expr {
+		switch (context.level) {
+			case None | Profiling:
+				expr = instrumentExpr(ensureBlockExpr(expr));
+				for (c in catches) {
+					c.expr = replaceCatch(c.expr, null);
+				}
+
+				return {expr: ETry(expr, catches), pos: expr.pos};
+			case Coverage:
+			case Both:
+		}
+		var location:Location = PositionTools.toLocation(expr.pos);
+		var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
+		var branchTry:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		branchesInfo.addBranch(branchTry);
+
+		var exprs:Array<Expr> = exprsFromBlock(instrumentExpr(ensureBlockExpr(expr)));
+		exprs.unshift(macro instrument.coverage.CoverageContext.logBranch($v{branchTry.id}));
+		expr = {expr: EBlock(exprs), pos: expr.pos}
+
+		for (c in catches) {
+			var branchCatch:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line,
+				location.range.end.line);
+			branchesInfo.addBranch(branchCatch);
+			c.expr = replaceCatch(c.expr, branchCatch);
+		}
+
+		return {expr: ETry(expr, catches), pos: expr.pos};
+	}
+
+	static function replaceCatch(expr:Expr, branch:Null<BranchInfo>):Expr {
+		expr = instrumentExpr(ensureBlockExpr(expr));
+
+		var exprs:Array<Expr> = exprsFromBlock(expr);
+		if (branch != null) {
+			exprs.unshift(macro instrument.coverage.CoverageContext.logBranch($v{branch.id}));
+		}
+		switch (context.level) {
+			case Profiling | Both:
+				exprs.unshift(macro instrument.profiler.Profiler.cancelExitFunction(__profiler__id__));
+			case _:
+		}
+		return {expr: EBlock(exprs), pos: expr.pos};
 	}
 
 	static function replaceThrow(expr:Expr):Expr {
