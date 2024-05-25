@@ -481,8 +481,7 @@ class Instrumentation {
 						case Coverage | Both:
 							instrumentedExprs.push(logExpression(e));
 					}
-					instrumentedExprs.push(instrumentExpr(e));
-
+					instrumentedExprs = addExprOrBlock(instrumentExpr(e), instrumentedExprs);
 					for (e in context.missingBranches) {
 						instrumentedExprs.push(e);
 					}
@@ -617,6 +616,16 @@ class Instrumentation {
 			default:
 				expr.map(instrumentExpr);
 		}
+	}
+
+	static function addExprOrBlock(expr:Expr, exprs:Array<Expr>):Array<Expr> {
+		switch (expr.expr) {
+			case EBlock(blkExprs):
+				exprs = exprs.concat(blkExprs);
+			case _:
+				exprs.push(expr);
+		}
+		return exprs;
 	}
 
 	static function instrumentFunctionExpr(expr:Expr, name:String, allReturn:Bool):Expr {
