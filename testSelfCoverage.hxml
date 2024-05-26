@@ -26,6 +26,9 @@
 -D coverage-codecov-reporter
 -D coverage-jacocoxml-reporter
 -D coverage-emma-reporter
+# -D debug_instrumentation
+
+# -D dump=pretty
 
 --run TestSelfMain
 -main TestSelfMain
