@@ -96,12 +96,20 @@ class IfBranches implements ICoverageTestee {
 
 	function doNothing() {}
 
+	public function ifBranchOpBoolTrueTrue2() {
+		if (true) {
+			doNothing();
+			return;
+		}
+	}
+
 	public function run() {
 		ifBranchTrue();
 		ifBranchFalse();
 		ifBranchReturn();
 		ifBranchOpBoolTrueFalse();
 		ifBranchOpBoolTrueTrue();
+		ifBranchOpBoolTrueTrue2();
 		ifBranchOpBoolAll(false, false);
 		ifBranchOpBoolAll(true, false);
 		ifBranchOpBoolAll(false, true);
