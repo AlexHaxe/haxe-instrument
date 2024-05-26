@@ -912,19 +912,12 @@ class Instrumentation {
 			pos: cond.pos
 		};
 		var trueExpr:Expr = {
-			expr: EBlock([
-				macro {
-					instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});
-				},
-				ifExpr
-			]),
+			expr: EBlock([macro instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}), ifExpr]),
 			pos: ifExpr.pos
 		}
 		var falseExpr:Expr = {
 			expr: EBlock([
-				macro {
-					instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
-				},
+				macro instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}),
 				elseExpr
 			]),
 			pos: elseExpr.pos
@@ -990,7 +983,7 @@ class Instrumentation {
 		}
 		var falseExpr:Expr = {
 			expr: EBlock([
-				macro {instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});},
+				macro instrument.coverage.CoverageContext.logBranch($v{branchFalse.id}),
 				logExpression(exprRight),
 				macro cast null
 			]),
@@ -1040,7 +1033,7 @@ class Instrumentation {
 
 		var trueExpr:Expr = {
 			expr: EBlock([
-				macro {instrument.coverage.CoverageContext.logBranch($v{branchTrue.id});},
+				macro instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}),
 				macro _instrumentValue // {expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}
 				// {expr: EField(expr, field, Safe), pos: expr.pos}
 				// {expr: EField({expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}, field, Normal), pos: expr.pos}
