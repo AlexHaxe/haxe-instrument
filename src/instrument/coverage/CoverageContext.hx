@@ -92,7 +92,11 @@ class CoverageContext {
 
 	public static function contextFromJson():CoverageContext {
 		var context:CoverageContext = new CoverageContext();
-		var jsonTypes:Array<TypeInfoStruct> = Json.parse(haxe.Resource.getString(Coverage.RESOURCE_NAME));
+		var typesResource = haxe.Resource.getString(Coverage.RESOURCE_NAME);
+		if (typesResource == null) {
+			return context;
+		}
+		var jsonTypes:Array<TypeInfoStruct> = Json.parse(typesResource);
 		for (type in jsonTypes) {
 			context.addType(TypeInfo.fromJson(type));
 		}
