@@ -586,7 +586,25 @@ class Instrumentation {
 				expr.map(instrumentExpr);
 
 			case EVars(vars):
-				expr.map(instrumentExpr);
+				var ret = [];
+				for (v in vars) {
+					if (v.expr == null) {
+						ret.push(v);
+						continue;
+					}
+					var v2:Var = {name: v.name, type: v.type, expr: instrumentExpr(v.expr)};
+					if (v.isFinal != null) {
+						v2.isFinal = v.isFinal;
+					}
+					if (v.isStatic != null) {
+						v2.isStatic = v.isStatic;
+					}
+					if (v.meta != null) {
+						v2.meta = v.meta;
+					}
+					ret.push(v2);
+				}
+				{expr: EVars(ret), pos: expr.pos};
 
 			case EBinop(op, e1, e2):
 				switch (op) {
@@ -623,6 +641,8 @@ class Instrumentation {
 
 	static function addExprOrBlock(expr:Expr, exprs:Array<Expr>):Array<Expr> {
 		switch (expr.expr) {
+			case EBlock(blkExprs) if (blkExprs.length <= 0):
+				exprs.push(expr);
 			case EBlock(blkExprs):
 				exprs = exprs.concat(blkExprs);
 			case _:
@@ -1166,9 +1186,9 @@ class Instrumentation {
 		}
 
 		return relocateExpr(macro {
-			var result = ${instrumentExpr(expr)};
+			var result = (${instrumentExpr(expr)});
 			instrument.profiler.Profiler.exitFunction(__profiler__id__);
-			return result;
+			return (result);
 		}, expr.pos);
 	}
 
@@ -1184,16 +1204,11 @@ class Instrumentation {
 			case Coverage:
 			case Both:
 		}
-		var location:Location = PositionTools.toLocation(expr.pos);
 		var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
-		var branchTry:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		branchesInfo.addBranch(branchTry);
-
-		var exprs:Array<Expr> = exprsFromBlock(instrumentExpr(ensureBlockExpr(expr)));
-		exprs.unshift(macro instrument.coverage.CoverageContext.logBranch($v{branchTry.id}));
-		expr = {expr: EBlock(exprs), pos: expr.pos}
+		expr = coverBranch(instrumentExpr(ensureBlockExpr(expr)), expr.pos, branchesInfo);
 
 		for (c in catches) {
+			var location:Location = PositionTools.toLocation(c.expr.pos);
 			var branchCatch:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line,
 				location.range.end.line);
 			branchesInfo.addBranch(branchCatch);

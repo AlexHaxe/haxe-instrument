@@ -19,7 +19,6 @@ class TestCoverage implements ITest {
 		data.addMissing(17, Expression);
 
 		data.addMissing(23, Branch);
-		data.addMissing(23, Expression);
 		data.addMissing(27, Expression);
 
 		data.addMissing(31, Branch);
@@ -41,8 +40,9 @@ class TestCoverage implements ITest {
 		data.addMissing(78, Expression);
 
 		data.addMissing(82, Branch);
-		data.addMissing(82, Expression);
 		data.addMissing(86, Expression);
+
+		data.addMissing(100, Branch);
 
 		data.save();
 
@@ -100,6 +100,7 @@ class TestCoverage implements ITest {
 
 	public function testTryCatch() {
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
+		data.addMissing(12, Branch);
 		data.addMissing(13, Expression);
 		data.addMissing(21, Expression);
 		data.save();
