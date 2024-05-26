@@ -2,6 +2,9 @@ package demo;
 
 import haxe.Exception;
 import demo.OpOverload.testOp;
+import demo.flixel.FlxColor;
+import demo.flixel.FlxPathfinder.FlxTypedPathfinder;
+import demo.flixel.FlxPoint;
 
 class MyTestApp {
 	var arrow = (a) -> a + 1;
@@ -62,6 +65,20 @@ class MyTestApp {
 			Sys.exit(0);
 
 		testOp(true, false);
+
+		flx();
+	}
+
+	function flx() {
+		var pathfinder = new FlxTypedPathfinder();
+		pathfinder.findPath(null, new FlxBasePoint(), new FlxBasePoint());
+		try {
+			pathfinder.int("");
+		} catch (e:Exception) {}
+
+		var color:FlxColor = 0xff0000;
+		color.red += 100;
+		color.redFloat += 1.6;
 	}
 
 	public function switchVal(val:Int) {
