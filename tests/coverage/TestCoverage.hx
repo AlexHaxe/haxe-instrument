@@ -11,37 +11,47 @@ class TestCoverage implements ITest {
 
 	public function testIfBranches() {
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
+		// ifBranchTrue
 		data.addMissing(9, Branch);
 		data.addMissing(9, Expression);
 
+		// ifBranchFalse
 		data.addMissing(16, Branch);
 		data.addMissing(16, Expression);
 		data.addMissing(17, Expression);
 
+		// ifBranchReturn
 		data.addMissing(23, Branch);
 		data.addMissing(27, Expression);
 
+		// ifBranchOpBoolTrueFalse
 		data.addMissing(31, Branch);
 		data.addMissing(31, Expression);
 		data.addMissing(35, Expression);
 
+		// ifBranchOpBoolTrueTrue
 		data.addMissing(39, Branch);
 		data.addMissing(39, Expression);
 		data.addMissing(43, Expression);
 
+		// opBoolOr
 		data.addMissing(56, Branch);
 
+		// ifBranchOpBool1
 		data.addMissing(66, Branch);
 		data.addMissing(66, Expression);
 		data.addMissing(70, Expression);
 
+		// ifBranchOpBool2
 		data.addMissing(74, Branch);
 		data.addMissing(74, Expression);
 		data.addMissing(78, Expression);
 
+		// ifBranchOpBool3
 		data.addMissing(82, Branch);
 		data.addMissing(86, Expression);
 
+		// ifBranchOpBoolTrueTrue2
 		data.addMissing(100, Branch);
 
 		data.save();
@@ -100,9 +110,27 @@ class TestCoverage implements ITest {
 
 	public function testTryCatch() {
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
+
+		// tryMissedCatch
 		data.addMissing(12, Branch);
 		data.addMissing(13, Expression);
+
+		// tryCatched
 		data.addMissing(21, Expression);
+
+		// tryCatched2
+		data.addMissing(37, Expression);
+		data.addMissing(40, Branch);
+		data.addMissing(41, Expression);
+
+		// tryCatched3
+		data.addMissing(49, Expression);
+		data.addMissing(52, Branch);
+
+		// tryCatched4
+		data.addMissing(61, Branch);
+		data.addMissing(63, Branch);
+
 		data.save();
 		runTestee("coverage.testcases.TryCatch");
 	}
