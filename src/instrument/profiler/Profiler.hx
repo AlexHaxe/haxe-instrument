@@ -139,9 +139,7 @@ class Profiler {
 			lock.sure().release();
 			return;
 		}
-		if (data != null) {
-			data.endTime = Timer.stamp();
-		}
+		data.endTime = Timer.stamp();
 		commitLastCallData(context);
 		lastExits.set(context.threadId, data);
 		lock.sure().release();
