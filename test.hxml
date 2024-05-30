@@ -5,6 +5,8 @@
 -lib safety
 -lib test-adapter
 
+-D instrument-coverage
+
 -main TestMain
 
 --run TestMain

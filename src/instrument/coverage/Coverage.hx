@@ -23,6 +23,7 @@ class Coverage {
 	 * used by internal `instrument.Instrumentation.endInstrumantation` function
 	 */
 	public static function endCoverage() {
+		#if instrument_coverage
 		var reporters:Array<ICoverageReporter> = [];
 
 		#if coverage_console_missing_reporter
@@ -58,5 +59,6 @@ class Coverage {
 		#end
 
 		endCustomCoverage(reporters);
+		#end
 	}
 }

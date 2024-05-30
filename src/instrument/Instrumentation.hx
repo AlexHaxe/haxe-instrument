@@ -75,6 +75,7 @@ class Instrumentation {
 		for (pack in includePackCoverage) {
 			Compiler.include(pack, true, excludePackCoverage, includeFolderCoverage);
 		}
+		Compiler.define("instrument-profiler");
 	}
 
 	public static function coverage(includes:Null<Array<String>> = null, folders:Null<Array<String>> = null, excludes:Null<Array<String>> = null) {
@@ -105,6 +106,7 @@ class Instrumentation {
 		}
 
 		Context.onGenerate(onGenerate);
+		Compiler.define("instrument-coverage");
 	}
 
 	static function installMetadata() {
