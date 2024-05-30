@@ -5,6 +5,7 @@ import instrument.coverage.Coverage;
 import coverage.testcases.IfBranches;
 import coverage.testcases.IgnoredCoverage;
 import coverage.testcases.MissingFields;
+import coverage.testcases.Returns;
 import coverage.testcases.SwitchBranches;
 import coverage.testcases.TryCatch;
 import coverage.testcases.WhileBranches;
@@ -18,6 +19,7 @@ class CoverageTestMain {
 		IfBranches.new,
 		IgnoredCoverage.new,
 		MissingFields.new,
+		Returns.new,
 		SwitchBranches.new,
 		#if (haxe >= version("4.3.0"))
 		TernaryBranches.new,

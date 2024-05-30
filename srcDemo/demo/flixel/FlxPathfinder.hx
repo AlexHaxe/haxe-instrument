@@ -21,12 +21,9 @@ class FlxTypedPathfinder<Tilemap> {
 	public static function tween(Options:TweenOptions) {}
 
 	inline function intHelper(name:String, invalid:(String) -> Void, backup:Int):Int {
-		invalid("test");
-
 		function complete() {}
-
 		tween({onComplete: (_) -> complete()});
-
+		invalid("test");
 		return backup;
 	}
 
