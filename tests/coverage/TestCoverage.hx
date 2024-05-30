@@ -75,6 +75,15 @@ class TestCoverage implements ITest {
 		runTestee("coverage.testcases.MissingFields");
 	}
 
+	public function testReturns() {
+		var data:ExpectedCoverageData = new ExpectedCoverageData();
+		data.addMissing(9, Branch);
+		data.addMissing(9, Expression);
+		data.addMissing(18, Expression);
+		data.save();
+		runTestee("coverage.testcases.Returns");
+	}
+
 	public function testSwitchBranches() {
 		var data:ExpectedCoverageData = new ExpectedCoverageData();
 		data.addMissing(10, Branch);
