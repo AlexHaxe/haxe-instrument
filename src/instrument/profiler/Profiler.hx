@@ -1,6 +1,7 @@
 package instrument.profiler;
 
 import haxe.Timer;
+import instrument.coverage.CoverageContext;
 import instrument.profiler.reporter.IProfilerReporter;
 import instrument.profiler.summary.CallData;
 import instrument.profiler.summary.CallSummaryData;
@@ -26,15 +27,9 @@ class Profiler {
 	static function getThreadContext():ThreadSummaryContext {
 		var context:Null<ThreadSummaryContext> = null;
 
-		if (lock == null) {
-			lock = new Mutex();
-		}
 		lock.sure().acquire();
 
 		var threadId:Int = determineThreadId();
-		if (threadContexts == null) {
-			threadContexts = new Map<Int, ThreadSummaryContext>();
-		}
 		if (!threadContexts.sure().exists(threadId)) {
 			context = {
 				threadId: threadId,
@@ -98,12 +93,6 @@ class Profiler {
 			endTime: -1
 		};
 
-		if (pendingCalls == null) {
-			pendingCalls = new Map<String, CallData>();
-		}
-		if (lastExits == null) {
-			lastExits = new Map<Int, CallData>();
-		}
 		commitLastCallData(context);
 
 		pendingCalls.sure().set('$newId', data);
@@ -178,6 +167,7 @@ class Profiler {
 	}
 
 	public static function endProfiler() {
+		#if instrument_profiler
 		var context:ThreadSummaryContext = getThreadContext();
 		if (context == null) {
 			return;
@@ -215,6 +205,7 @@ class Profiler {
 			ctx.itsMe = false;
 		}
 		completed = false;
+		#end
 	}
 
 	static function commitLastCallData(context:ThreadSummaryContext) {
@@ -242,12 +233,12 @@ class Profiler {
 
 	static function __init__() {
 		completed = false;
-		if (lock == null) {
-			lock = new Mutex();
-		}
-		if (threadContexts == null) {
-			threadContexts = new Map<Int, ThreadSummaryContext>();
-		}
+		lock = new Mutex();
+		lock.sure().acquire();
+
+		threadContexts = new Map<Int, ThreadSummaryContext>();
+		pendingCalls = new Map<String, CallData>();
+		lastExits = new Map<Int, CallData>();
 
 		reporter = [];
 
@@ -282,5 +273,6 @@ class Profiler {
 		for (r in reporter.sure()) {
 			r.startProfiler();
 		}
+		lock.sure().release();
 	}
 }

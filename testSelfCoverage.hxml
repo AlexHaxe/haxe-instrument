@@ -17,6 +17,7 @@
 -D profiler-csv-reporter=profiler/summary.csv
 -D profiler-d3-reporter=profiler/flame.json
 -D profiler-cpuprofile-reporter=profiler/Profile.cpuprofile
+-D instrument-profiler
 
 -D coverage-console-summary-reporter
 -D coverage-console-file-summary-reporter
@@ -27,6 +28,7 @@
 -D coverage-jacocoxml-reporter
 -D coverage-emma-reporter
 # -D debug_instrumentation
+-D instrument-coverage
 
 # -D dump=pretty
 
