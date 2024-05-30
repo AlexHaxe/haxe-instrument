@@ -1129,6 +1129,15 @@ class Instrumentation {
 
 	static function replaceReturn(expr:Expr):Expr {
 		switch (context.level) {
+			case None | Coverage if (context.implicitReturn):
+				if (expr == null) {
+					return relocateExpr(macro {
+						@:implicitReturn return;
+					}, Context.currentPos());
+				}
+				return relocateExpr(macro {
+					@:implicitReturn return (${instrumentExpr(expr)});
+				}, expr.pos);
 			case None | Coverage:
 				if (expr == null) {
 					return {expr: EReturn(null), pos: Context.currentPos()};
