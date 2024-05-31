@@ -39,6 +39,22 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 		var overallColumn:Int = 7;
 		var totalWidth:Int = fileColumn + typeColumn + fieldColumn + branchColumn + expressionColumn + lineColumn + overallColumn + 6 * 3;
 
+		function outputCoverage(l:SummaryLine) {
+			var line = l.file.rpad(" ", fileColumn)
+				+ delimiter
+				+ summaryColumn(l.typeCount, l.typesCovered, typeColumn)
+				+ delimiter
+				+ summaryColumn(l.fieldCount, l.fieldsCovered, fieldColumn)
+				+ delimiter
+				+ summaryColumn(l.branchCount, l.branchesCovered, branchColumn)
+				+ delimiter
+				+ summaryColumn(l.expressionCount, l.expressionsCovered, expressionColumn)
+				+ delimiter
+				+ summaryColumn(l.lineCount, l.linesCovered, lineColumn)
+				+ delimiter
+				+ overallSumColumn(l.fieldCount + l.branchCount + l.expressionCount, l.fieldsCovered + l.branchesCovered + l.expressionsCovered, overallColumn);
+			output(line);
+		}
 		output("");
 		output("".rpad("=", totalWidth));
 		var line:String = '${"".lpad(" ", fileColumn)}' + delimiter + '${"Types".rpad(" ", typeColumn)}' + delimiter + '${"Fields".rpad(" ", fieldColumn)}'
@@ -52,7 +68,9 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 		output(line);
 		output("".rpad("=", totalWidth));
 		var lastPrefix:String = "";
+		var folderCoverage:SummaryLine = newFolderCoverage("");
 		var first:Bool = true;
+
 		for (l in lines) {
 			if (first) {
 				if (l.prefix.length > 0) {
@@ -60,29 +78,24 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 					lastPrefix = l.prefix;
 					first = false;
 				}
+				folderCoverage = newFolderCoverage(lastPrefix);
 			} else {
 				if (lastPrefix != l.prefix) {
+					output("".rpad("-", totalWidth));
+					folderCoverage.file = "Sub-Total: " + folderCoverage.file;
+					outputCoverage(folderCoverage);
 					output("");
 					output('[${l.prefix}]');
 					lastPrefix = l.prefix;
+					folderCoverage = newFolderCoverage(lastPrefix);
 				}
 			}
-			line = l.file.rpad(" ", fileColumn)
-				+ delimiter
-				+ summaryColumn(l.typeCount, l.typesCovered, typeColumn)
-				+ delimiter
-				+ summaryColumn(l.fieldCount, l.fieldsCovered, fieldColumn)
-				+ delimiter
-				+ summaryColumn(l.branchCount, l.branchesCovered, branchColumn)
-				+ delimiter
-				+ summaryColumn(l.expressionCount, l.expressionsCovered, expressionColumn)
-				+ delimiter
-				+ summaryColumn(l.lineCount, l.linesCovered, lineColumn)
-				+ delimiter
-				+ overallSumColumn(l.fieldCount + l.branchCount + l.expressionCount, l.fieldsCovered + l.branchesCovered + l.expressionsCovered,
-					overallColumn);
-			output(line);
+			addFolderCoverage(folderCoverage, l);
+			outputCoverage(l);
 		}
+		output("".rpad("-", totalWidth));
+		folderCoverage.file = "Sub-Total: " + folderCoverage.file;
+		outputCoverage(folderCoverage);
 		output("".rpad("=", totalWidth));
 		line = "Total:".lpad(" ", fileColumn)
 			+ delimiter
@@ -105,6 +118,36 @@ class ConsoleCoverageFileSummaryReporter implements ICoverageReporter {
 		output(line);
 		output("".rpad("=", totalWidth));
 		output("");
+	}
+
+	function newFolderCoverage(prefix:String):SummaryLine {
+		return {
+			file: '[${prefix}]',
+			prefix: prefix,
+			typeCount: 0,
+			typesCovered: 0,
+			fieldCount: 0,
+			fieldsCovered: 0,
+			branchCount: 0,
+			branchesCovered: 0,
+			expressionCount: 0,
+			expressionsCovered: 0,
+			lineCount: 0,
+			linesCovered: 0
+		}
+	}
+
+	function addFolderCoverage(folderCoverage:SummaryLine, line:SummaryLine) {
+		folderCoverage.typeCount += line.typeCount;
+		folderCoverage.typesCovered += line.typesCovered;
+		folderCoverage.fieldCount += line.fieldCount;
+		folderCoverage.fieldsCovered += line.fieldsCovered;
+		folderCoverage.branchCount += line.branchCount;
+		folderCoverage.branchesCovered += line.branchesCovered;
+		folderCoverage.expressionCount += line.expressionCount;
+		folderCoverage.expressionsCovered += line.expressionsCovered;
+		folderCoverage.lineCount += line.lineCount;
+		folderCoverage.linesCovered += line.linesCovered;
 	}
 
 	function longestFileName(lines:Array<SummaryLine>):Int {

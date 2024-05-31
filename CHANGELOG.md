@@ -9,6 +9,7 @@
 - added support for null safe operator (?.), fixes [#17](https://github.com/AlexHaxe/haxe-instrument/issues/17)
 - added try…catch branch coverage
 - added debugPosition to debug output
+- added sub-total lines to ConsoleCoverageFileSummaryReporter to display summary per folder group
 - fixed exception in calcStatistic with empty coverage data
 - fixed handling of abstract constructors
 - fixed branch coverage with abstract op overload, fixes [#11](https://github.com/AlexHaxe/haxe-instrument/issues/11)
