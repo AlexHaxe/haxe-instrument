@@ -805,7 +805,7 @@ class Instrumentation {
 	static function coverBoolCondition(expr:Expr, branchesInfo:BranchesInfo):Expr {
 		switch (context.level) {
 			case None | Profiling:
-				var exprs:Array<Expr> = exprsFromBlock(expr);
+				var exprs:Array<Expr> = exprsFromBlock(instrumentExpr(expr));
 				return {expr: EBlock(exprs), pos: expr.pos};
 			case Coverage:
 			case Both:
@@ -832,8 +832,8 @@ class Instrumentation {
 	static function coverWhileCondition(cond:Expr, bodyExpr:Expr, normalWhile:Bool, branchesInfo:BranchesInfo):Expr {
 		switch (context.level) {
 			case None | Profiling:
-				cond = {expr: EBlock(exprsFromBlock(cond)), pos: cond.pos};
-				bodyExpr = {expr: EBlock(exprsFromBlock(bodyExpr)), pos: bodyExpr.pos};
+				cond = instrumentExpr(ensureBlockExpr(cond));
+				bodyExpr = instrumentExpr(ensureBlockExpr(bodyExpr));
 				return {expr: EWhile(cond, bodyExpr, normalWhile), pos: cond.pos};
 			case Coverage:
 			case Both:
@@ -874,12 +874,11 @@ class Instrumentation {
 	static function coverIfCondition(cond:Expr, ifExpr:Expr, elseExpr:Null<Expr>, branchesInfo:BranchesInfo):Expr {
 		switch (context.level) {
 			case None | Profiling:
-				cond = {expr: EBlock(exprsFromBlock(cond)), pos: cond.pos};
-				ifExpr = {expr: EBlock(exprsFromBlock(ifExpr)), pos: ifExpr.pos};
+				cond = {expr: EBlock(exprsFromBlock(instrumentExpr(cond))), pos: cond.pos};
+				ifExpr = {expr: EBlock(exprsFromBlock(instrumentExpr(ifExpr))), pos: ifExpr.pos};
 				if (elseExpr != null) {
-					elseExpr = {expr: EBlock(exprsFromBlock(elseExpr)), pos: elseExpr.pos};
+					elseExpr = {expr: EBlock(exprsFromBlock(instrumentExpr(elseExpr))), pos: elseExpr.pos};
 				}
-
 				return {expr: EIf(cond, ifExpr, elseExpr), pos: cond.pos};
 			case Coverage:
 			case Both:
@@ -931,9 +930,9 @@ class Instrumentation {
 	static function coverTernaryCondition(cond:Expr, ifExpr:Expr, elseExpr:Expr, branchesInfo:BranchesInfo):Expr {
 		switch (context.level) {
 			case None | Profiling:
-				cond = {expr: EBlock(exprsFromBlock(cond)), pos: cond.pos};
-				ifExpr = {expr: EBlock(exprsFromBlock(ifExpr)), pos: ifExpr.pos};
-				elseExpr = {expr: EBlock(exprsFromBlock(elseExpr)), pos: elseExpr.pos};
+				cond = {expr: EBlock(exprsFromBlock(instrumentExpr(cond))), pos: cond.pos};
+				ifExpr = {expr: EBlock(exprsFromBlock(instrumentExpr(ifExpr))), pos: ifExpr.pos};
+				elseExpr = {expr: EBlock(exprsFromBlock(instrumentExpr(elseExpr))), pos: elseExpr.pos};
 
 				return {expr: ETernary(cond, ifExpr, elseExpr), pos: cond.pos};
 			case Coverage:
@@ -990,8 +989,8 @@ class Instrumentation {
 	static function coverNullCoal(exprLeft:Expr, exprRight:Expr, branchesInfo:BranchesInfo):Expr {
 		switch (context.level) {
 			case None | Profiling:
-				exprLeft = {expr: EBlock(exprsFromBlock(exprLeft)), pos: exprLeft.pos};
-				exprRight = {expr: EBlock(exprsFromBlock(exprRight)), pos: exprRight.pos};
+				exprLeft = {expr: EBlock(exprsFromBlock(instrumentExpr(exprLeft))), pos: exprLeft.pos};
+				exprRight = {expr: EBlock(exprsFromBlock(instrumentExpr(exprRight))), pos: exprRight.pos};
 				return {expr: EBinop(OpNullCoal, exprLeft, exprRight), pos: exprLeft.pos};
 			case Coverage:
 			case Both:

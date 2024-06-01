@@ -21,6 +21,10 @@ class ConsoleHierarchyReporter implements IProfilerReporter {
 		if (tree == null) {
 			return;
 		}
+		if (indent.length > 1000) {
+			output(indent + " …………tree truncated");
+			return;
+		}
 		if ((tree.functionName == null) || (tree.functionName.length <= 0)) {
 			output(indent + "+ " + tree.className + " " + (tree.duration * 1000) + "ms");
 		} else {

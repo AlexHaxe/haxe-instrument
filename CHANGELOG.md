@@ -20,6 +20,7 @@
 - fixed @:implicitReturn handling
 - fixed handling of empty blocks
 - fixed ifs without else branch
+- fixed missing profiler exitFunction calls, fixes [#21](https://github.com/AlexHaxe/haxe-instrument/issues/21)
 - refactored call hierarchy data collection
 - reduced number of blocks in blocks when instrumenting
 
