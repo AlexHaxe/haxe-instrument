@@ -169,7 +169,7 @@ class MyTestApp {
 		trace("unreachable");
 	}
 
-	public inline function whileLoop():Null<Int> {
+	public function whileLoop():Null<Int> {
 		while (true) {
 			return null;
 		}

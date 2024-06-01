@@ -74,6 +74,9 @@ class HierarchicalData {
 
 	public function get_firstStartTime():Float {
 		if (calls.length <= 0) {
+			if (childs == null) {
+				return 0;
+			}
 			if (childs.length <= 0) {
 				return 0;
 			}
@@ -84,6 +87,9 @@ class HierarchicalData {
 
 	public function get_lastEndTime():Float {
 		if (calls.length <= 0) {
+			if (childs == null) {
+				return 0;
+			}
 			if (childs.length <= 0) {
 				return 0;
 			}

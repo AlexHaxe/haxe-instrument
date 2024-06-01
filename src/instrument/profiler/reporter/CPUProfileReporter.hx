@@ -145,7 +145,7 @@ class CPUProfileReporter extends FileBaseReporter implements IProfilerReporter {
 
 		var totalHitCount:Int = tree.getTotalHitCount();
 		var sampleFactor:Float = totalHitCount / (endTime - startTime);
-		trace(totalHitCount);
+		// trace(totalHitCount);
 
 		var profile:CPUProfileTwo = {
 			nodes: [],
