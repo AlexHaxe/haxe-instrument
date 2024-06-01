@@ -1,14 +1,15 @@
 package instrument.profiler;
 
 import haxe.Timer;
-import instrument.coverage.CoverageContext;
 import instrument.profiler.reporter.IProfilerReporter;
 import instrument.profiler.summary.CallData;
-import instrument.profiler.summary.CallSummaryData;
 import instrument.profiler.summary.FlatSummary;
-import instrument.profiler.summary.HierarchicalData;
 import instrument.profiler.summary.HierarchicalSummary;
 import instrument.profiler.summary.ThreadSummaryContext;
+#if instrument_profiler
+import instrument.profiler.summary.CallSummaryData;
+import instrument.profiler.summary.HierarchicalData;
+#end
 
 @:ignoreProfiler
 @:expose
