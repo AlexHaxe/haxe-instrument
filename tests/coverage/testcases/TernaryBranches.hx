@@ -64,6 +64,14 @@ class TernaryBranches implements ICoverageTestee {
 		};
 	}
 
+	public function nullSafetyCall(cb:() -> Null<String>) {
+		return cb()?.split(";")?.map(item -> item.toLowerCase()) ?? [".exe", ".cmd", ".bat", ".com"];
+	}
+
+	public function nullSafetyCallFullyCovered(cb:() -> Null<String>) {
+		return cb()?.split(";")?.map(item -> item.toLowerCase()) ?? [".exe", ".cmd", ".bat", ".com"];
+	}
+
 	public function run() {
 		ternaryAllFalse(null);
 
@@ -74,5 +82,10 @@ class TernaryBranches implements ICoverageTestee {
 
 		ternaryAllCovered(null);
 		ternaryAllCovered({defaultDuration: 10, keyPrefix: "prefix", serializer: {serialize: 100, unserialize: 200}});
+
+		nullSafetyCall(() -> null);
+
+		nullSafetyCallFullyCovered(() -> null);
+		nullSafetyCallFullyCovered(() -> "");
 	}
 }
