@@ -598,12 +598,16 @@ class Instrumentation {
 					if (v.isFinal != null) {
 						v2.isFinal = v.isFinal;
 					}
+					#if (haxe >= version("4.3.0"))
 					if (v.isStatic != null) {
 						v2.isStatic = v.isStatic;
 					}
+					#end
+					#if (haxe >= version("4.2.0"))
 					if (v.meta != null) {
 						v2.meta = v.meta;
 					}
+					#end
 					ret.push(v2);
 				}
 				{expr: EVars(ret), pos: expr.pos};
@@ -629,12 +633,9 @@ class Instrumentation {
 						expr.map(instrumentExpr);
 				}
 			#if (haxe >= version("4.3.0"))
-			case EField(e, field, Safe) if (haxe.macro.Context.defined("js")):
+			case EField(e, field, Safe):
 				e = instrumentExpr(ensureBlockExpr(e));
 				{expr: EField(e, field, Safe), pos: expr.pos};
-			case EField(e, field, Safe):
-				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
-				coverSafeField(e, field, branchesInfo);
 			#end
 			default:
 				expr.map(instrumentExpr);
@@ -993,91 +994,7 @@ class Instrumentation {
 		}
 		var ifExpr:Expr = {expr: EIf(condExpr, trueExpr, falseExpr), pos: exprLeft.pos};
 		var block:Expr = {expr: EBlock([varExpr, ifExpr]), pos: exprLeft.pos};
-		return {expr: EBinop(OpNullCoal, {expr: ECast(block, null), pos: exprLeft.pos}, exprRight), pos: exprLeft.pos};
-	}
-
-	static function coverSafeField(expr:Expr, field:String, branchesInfo:BranchesInfo):Expr {
-		switch (context.level) {
-			case None | Profiling:
-				expr = {expr: EBlock(exprsFromBlock(expr)), pos: expr.pos};
-				return {expr: EField(expr, field, Safe), pos: expr.pos};
-			case Coverage:
-			case Both:
-		}
-
-		var location:Location = PositionTools.toLocation(expr.pos);
-		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
-		branchesInfo.addBranch(branchTrue);
-		branchesInfo.addBranch(branchFalse);
-
-		// var fieldAccess = instrumentExpr(ensureBlockExpr(expr));
-		// expr = instrumentExpr(ensureBlockExpr(expr));
-
-		var varExpr:Expr = {
-			expr: EVars([
-				{
-					name: "_instrumentValue",
-					expr: {expr: EField(expr, field, Safe), pos: expr.pos}
-				}
-			]),
-			pos: expr.pos
-		};
-		//
-		// 		var varExpr:Expr = {
-		// 			expr: EVars([{name: "_instrumentValue", type: null, expr: fieldAccess}]),
-		// 			pos: expr.pos
-		// 		};
-		var condExpr:Expr = {
-			expr: EBinop(OpNotEq, {expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}, {expr: EConst(CIdent("null")), pos: expr.pos}),
-			pos: expr.pos
-		};
-
-		var trueExpr:Expr = {
-			expr: EBlock([
-				macro instrument.coverage.CoverageContext.logBranch($v{branchTrue.id}),
-				macro _instrumentValue // {expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}
-				// {expr: EField(expr, field, Safe), pos: expr.pos}
-				// {expr: EField({expr: EConst(CIdent("_instrumentValue")), pos: expr.pos}, field, Normal), pos: expr.pos}
-			]),
-			pos: expr.pos
-		};
-		var falseExpr:Expr = macro {
-			instrument.coverage.CoverageContext.logBranch($v{branchFalse.id});
-			null;
-		};
-
-		var ifExpr:Expr = {
-			// expr: ECast({expr: EIf(condExpr, trueExpr, falseExpr), pos: expr.pos}, null),
-			expr: EIf(condExpr, trueExpr, falseExpr),
-			pos: expr.pos
-		};
-
-		var func:Expr = {
-			expr: EFunction(FNamed("_safeNav", false), {
-				args: [],
-				expr: {
-					expr: EBlock([varExpr, {expr: EReturn(ifExpr), pos: expr.pos}]),
-					pos: expr.pos
-				}
-			}),
-			pos: expr.pos
-		};
-
-		return {
-			expr: EBlock([
-				func,
-				{expr: ECall({expr: EConst(CIdent("_safeNav")), pos: expr.pos}, []), pos: expr.pos}
-			]),
-			pos: expr.pos
-		};
-		// return {
-		// 	// expr: EField({
-		// 	expr: EBlock([varExpr, ifExpr]),
-		// 	// pos: expr.pos
-		// 	// }, field, Safe),
-		// 	pos: expr.pos
-		// };
+		return {expr: EBinop(OpNullCoal, block, exprRight), pos: exprLeft.pos};
 	}
 	#end
 

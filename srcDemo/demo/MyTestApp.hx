@@ -1,10 +1,12 @@
 package demo;
 
 import haxe.Exception;
-import demo.OpOverload.testOp;
 import demo.flixel.FlxColor;
 import demo.flixel.FlxPathfinder.FlxTypedPathfinder;
 import demo.flixel.FlxPoint;
+#if (haxe >= version("4.2.0"))
+import demo.OpOverload.testOp;
+#end
 
 class MyTestApp {
 	var arrow = (a) -> a + 1;
@@ -16,11 +18,13 @@ class MyTestApp {
 		noBody3(true);
 		noBody3(false);
 		noBody5(11);
+		#if (haxe >= version("4.2.0"))
 		moduleBody();
 		moduleBody();
 		moduleBody();
 		moduleBody();
 		moduleBody();
+		#end
 		var image:ImageName = "test";
 
 		trace(arrow(val));
@@ -64,7 +68,9 @@ class MyTestApp {
 		if (false)
 			Sys.exit(0);
 
+		#if (haxe >= version("4.2.0"))
 		testOp(true, false);
+		#end
 
 		flx();
 	}
@@ -128,8 +134,10 @@ class MyTestApp {
 
 	inline function noBody3(val:Bool) {
 		if (val) {
+			#if (haxe >= version("4.2.0"))
 			moduleBody();
 			moduleBody();
+			#end
 			return;
 		}
 		trace("nobody");
@@ -198,11 +206,13 @@ class MyTestApp {
 	}
 }
 
+#if (haxe >= version("4.2.0"))
 function moduleBody()
 	trace("module level no body block");
 
 function download():String
 	return "download";
+#end
 
 enum abstract Role(String) to String {
 	public var RoleAdmin = "admin";
@@ -219,6 +229,7 @@ abstract Distance(Int) from Int {
 	}
 }
 
+#if (haxe >= version("4.2.0"))
 function testMe(a:Int, b:String):String {
 	return switch [a, b] {
 		case [_, "a"]: "A";
@@ -226,3 +237,4 @@ function testMe(a:Int, b:String):String {
 		case _: "C";
 	}
 }
+#end
