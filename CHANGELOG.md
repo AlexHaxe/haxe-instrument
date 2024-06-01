@@ -4,7 +4,7 @@
 
 ## version 1.2.0 (2024-06-xx)
 
-- added `-D instrument-quiet``conditional to skip printing dots during instrumentation
+- added `-D instrument-quiet` conditional to skip printing dots during instrumentation
 - added support for null coalesence operator (??), fixes [#17](https://github.com/AlexHaxe/haxe-instrument/issues/17)
 - added support for null safe operator (?.), fixes [#17](https://github.com/AlexHaxe/haxe-instrument/issues/17)
 - added try…catch branch coverage
