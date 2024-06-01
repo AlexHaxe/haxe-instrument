@@ -14,7 +14,7 @@ jobs:
   build:
     strategy:
       matrix:
-        haxe-version: ['4.2.5', 'nightly']
+        haxe-version: ['4.2.5', '4.3.4', 'nightly']
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -22,11 +22,11 @@ jobs:
       if: matrix.platform == 'windows-latest'
       run: git config --global core.autocrlf false
     - name: Checkout Formatter sources
-      uses: actions/checkout@v1
-    - name: Use Node.js 10
-      uses: actions/setup-node@v1
+      uses: actions/checkout@v4
+    - name: Use Node.js 18
+      uses: actions/setup-node@v4
       with:
-        node-version: 10
+        node-version: 18
     - name: Run npm install
       run: npm ci
     - name: Install Haxe version ${{ matrix.haxe-version }}
@@ -47,5 +47,5 @@ jobs:
     - name: Run tests
       run: npx haxe test.hxml
     - name: Upload results to codecov
-      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.2.5'
+      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.3.4'
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"

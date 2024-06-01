@@ -17,9 +17,6 @@ class ConsoleDetailReporter implements IProfilerReporter {
 
 	public function enterFunction(data:CallData) {
 		output(">>> [" + data.id + "] " + data.location + ": " + data.className + "." + data.functionName);
-		// + "("
-		// + data.args.join(", ")
-		// + ")");
 	}
 
 	public function exitFunction(data:CallData) {
