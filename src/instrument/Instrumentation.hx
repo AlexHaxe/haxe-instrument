@@ -1,8 +1,10 @@
 package instrument;
 
+import haxe.extern.EitherType;
 import haxe.io.Path;
 #if (sys || nodejs)
 import sys.FileSystem;
+import sys.io.File;
 #end
 #if macro
 import haxe.display.Position.Location;
@@ -21,6 +23,8 @@ import instrument.coverage.TypeInfo;
 using haxe.macro.ExprTools;
 using instrument.InstrumentationType;
 #end
+
+typedef IncludeExcludeFolders = Null<EitherType<String, Array<String>>>;
 
 @:ignoreProfiler
 class Instrumentation {
@@ -43,18 +47,18 @@ class Instrumentation {
 	static var context:InstrumentationContext;
 	static var level:InstrumentationType = None;
 
-	public static function profiling(includes:Null<Array<String>> = null, folders:Null<Array<String>> = null, excludes:Null<Array<String>> = null) {
+	public static function profiling(includes:IncludeExcludeFolders = null, folders:IncludeExcludeFolders = null, excludes:IncludeExcludeFolders = null) {
 		if (Context.defined(DISPLAY)) {
 			return;
 		}
 		if (includes != null) {
-			includePackProfiling = includes;
+			includePackProfiling = readIncludesExcludes(includes);
 		}
 		if (folders != null) {
-			includeFolderProfiling = folders;
+			includeFolderProfiling = readIncludesExcludes(folders);
 		}
 		if (excludes != null) {
-			excludePackProfiling = excludes;
+			excludePackProfiling = readIncludesExcludes(excludes);
 		}
 		for (pack in includePackProfiling) {
 			if (excludePackProfiling.length <= 0) {
@@ -78,18 +82,18 @@ class Instrumentation {
 		Compiler.define("instrument-profiler");
 	}
 
-	public static function coverage(includes:Null<Array<String>> = null, folders:Null<Array<String>> = null, excludes:Null<Array<String>> = null) {
+	public static function coverage(includes:IncludeExcludeFolders = null, folders:IncludeExcludeFolders = null, excludes:IncludeExcludeFolders = null) {
 		if (Context.defined(DISPLAY)) {
 			return;
 		}
 		if (includes != null) {
-			includePackCoverage = includes;
+			includePackCoverage = readIncludesExcludes(includes);
 		}
 		if (folders != null) {
-			includeFolderCoverage = folders;
+			includeFolderCoverage = readIncludesExcludes(folders);
 		}
 		if (excludes != null) {
-			excludePackCoverage = excludes;
+			excludePackCoverage = readIncludesExcludes(excludes);
 		}
 
 		switch (level) {
@@ -107,6 +111,20 @@ class Instrumentation {
 
 		Context.onGenerate(onGenerate);
 		Compiler.define("instrument-coverage");
+	}
+
+	static function readIncludesExcludes(inclExcl:EitherType<String, Array<String>>):Array<String> {
+		var list:Array<String> = if (inclExcl is String) {
+			var fileName:String = cast inclExcl;
+			if (!FileSystem.exists(fileName)) {
+				return [];
+			}
+			var content = File.getContent(fileName);
+			content.split("\n").map(s -> s.trim()).filter(s -> s.length > 0);
+		} else {
+			inclExcl;
+		}
+		return list;
 	}
 
 	static function installMetadata() {
@@ -215,6 +233,24 @@ class Instrumentation {
 		return type;
 	}
 
+	static function filterFieldName(fieldName:String, type:InstrumentationType):InstrumentationType {
+		var fullFieldName = '${context.pack}.${context.className}.$fieldName';
+
+		for (exclude in excludePackCoverage) {
+			if (fullFieldName.startsWith(exclude)) {
+				type = type.remove(Coverage);
+				break;
+			}
+		}
+		for (exclude in excludePackProfiling) {
+			if (fullFieldName.startsWith(exclude)) {
+				type = type.remove(Profiling);
+				break;
+			}
+		}
+		return type;
+	}
+
 	static function instrumentFields():Null<Array<Field>> {
 		if (Context.defined(DISPLAY)) {
 			return null;
@@ -253,6 +289,7 @@ class Instrumentation {
 		var typeLevel:InstrumentationType = context.level;
 		for (field in fields) {
 			context.level = filterFieldMeta(field.meta, typeLevel);
+			context.level = filterFieldName(field.name, context.level);
 			switch (context.level) {
 				case None:
 					continue;

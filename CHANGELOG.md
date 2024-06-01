@@ -10,6 +10,7 @@
 - added try…catch branch coverage
 - added debugPosition to debug output
 - added sub-total lines to ConsoleCoverageFileSummaryReporter to display summary per folder group
+- added support for file based configuration of profiler and coverage folders and packages
 - fixed exception in calcStatistic with empty coverage data
 - fixed handling of abstract constructors
 - fixed branch coverage with abstract op overload, fixes [#11](https://github.com/AlexHaxe/haxe-instrument/issues/11)

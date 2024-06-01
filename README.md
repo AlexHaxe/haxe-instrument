@@ -17,12 +17,14 @@ requires Haxe 4.1.x or higher
 
 ```hxml
 -lib instrument
---macro instrument.Instrumentation.coverage([include packages], [include folders], [exclude packages])
+--macro instrument.Instrumentation.coverage([include packages] | fileName, [include folders] | fileName, [exclude packages] | fileName)
 ```
 
-- include packages - takes an array of package names you want to collect coverage data on. names are matched against fully qualified type names using `StringTools.startsWith`
+- include packages - takes an array of package and type names you want to collect coverage data on. names are matched against fully qualified type names ("`package name`.`type name`") using `StringTools.startsWith`
 - include folders - array of folders containing code for coverage data collection. `Compiler.include` is used to make sure your types get included
-- exclude packages - array of packages to ignore, e.g. because they are for a different target. again using `StringTools.startsWith` to match fully qualified type names against list
+- exclude packages - array of packages, types and fields to ignore, e.g. because they are for a different target. again using `StringTools.startsWith` to match fully qualified type name ("`package name`.`type name`") and field names ("`package name`.`type name`.`field name`") against list.
+
+instead of passing an array each parameter will also take a filename pointing to a file containing package, type, field or folder names, allowing you to shorten the macro call. files should contain one entry per line with a `\n` as line break. there is no difference in behaviour between passing an array or using files for configuration.
 
 make sure you include your source folder(s), otherwise you will only see coverage stats of types touched during run.
 
@@ -194,12 +196,14 @@ includes line coverage for each file.
 
 ```hxml
 -lib instrument
---macro instrument.Instrumentation.profiling([include packages], [include folders], [exclude packages])
+--macro instrument.Instrumentation.profiling([include packages] | fileName, [include folders] | fileName, [exclude packages] | fileName)
 ```
 
-- include packages - takes an array of package names you want to collect coverage data on. names are matched against fully qualified type names using `StringTools.startsWith`
+- include packages - takes an array of package and type names you want to collect coverage data on. names are matched against fully qualified type names ("`package name`.`type name`") using `StringTools.startsWith`
 - include folders - array of folders containing code for coverage data collection. `Compiler.include` is used to make sure your types get included
-- exclude packages - array of packages to ignore, e.g. because they are for a different target. again using `StringTools.startsWith` to match fully qualified type names against list
+- exclude packages - array of packages, types and fields to ignore, e.g. because they are for a different target. again using `StringTools.startsWith` to match fully qualified type name ("`package name`.`type name`") and field names ("`package name`.`type name`.`field name`") against list.
+
+instead of passing an array each parameter will also take a filename pointing to a file containing package, type, field or folder names, allowing you to shorten the macro call. files should contain one entry per line with a `\n` as line break. there is no difference in behaviour between passing an array or using files for configuration.
 
 profiling was written with multithreading in mind, but's currently untested
 
