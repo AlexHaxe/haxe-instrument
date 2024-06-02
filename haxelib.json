@@ -9,7 +9,7 @@
 	],
 	"description": "a profiling and coverage library for Haxe",
 	"version": "1.2.0",
-	"releasenote": "added support for null coalesence and safe navigation operators, also bugfixes - see CHANGELOG",
+	"releasenote": "added support for null coalesence and safe navigation operators, reworked branch coverage, also bugfixes - see CHANGELOG",
 	"contributors": [
 		"AlexHaxe"
 	],
