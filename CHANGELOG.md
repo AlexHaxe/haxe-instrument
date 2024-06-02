@@ -2,7 +2,7 @@
 
 ## dev branch / next version (1.x.x)
 
-## version 1.2.0 (2024-06-xx)
+## version 1.2.0 (2024-06-02)
 
 - added `-D instrument-quiet` conditional to skip printing dots during instrumentation
 - added support for null coalesence operator (??), fixes [#17](https://github.com/AlexHaxe/haxe-instrument/issues/17)
