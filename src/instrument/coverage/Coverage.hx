@@ -34,7 +34,9 @@ class Coverage {
 	 *
 	 */
 	public static function resetAttributableCoverage() {
-		CoverageContext.coveredAttributable.clear();
+		if (CoverageContext.coveredAttributable != null) {
+			CoverageContext.coveredAttributable.clear();
+		}
 	}
 
 	/**

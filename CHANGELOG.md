@@ -2,6 +2,10 @@
 
 ## dev branch / next version (1.x.x)
 
+## version 1.3.1 (2025-01-07)
+
+- fixed null reference when resetting attributable coverage for a zero coverage file
+
 ## version 1.3.0 (2025-01-07)
 
 - added support for attributable coverage
