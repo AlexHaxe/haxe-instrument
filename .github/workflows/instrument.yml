@@ -14,7 +14,7 @@ jobs:
   build:
     strategy:
       matrix:
-        haxe-version: ['4.2.5', '4.3.4', 'nightly']
+        haxe-version: ['4.3.6', 'nightly']
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -47,5 +47,5 @@ jobs:
     - name: Run tests
       run: npx haxe test.hxml
     - name: Upload results to codecov
-      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.3.4'
+      if: success() && matrix.platform == 'ubuntu-latest' && matrix.haxe-version == '4.3.6'
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
