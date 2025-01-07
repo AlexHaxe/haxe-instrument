@@ -9,6 +9,7 @@ class CoverageContext {
 	static var id:Int = 0;
 
 	public static var covered:Null<Map<Int, Int>> = null;
+	public static var coveredAttributable:Null<Map<Int, Int>> = null;
 
 	public var types:Array<TypeInfo>;
 	public var files:Array<FileInfo>;
@@ -114,6 +115,9 @@ class CoverageContext {
 		if (covered == null) {
 			covered = new Map<Int, Int>();
 		}
+		if (coveredAttributable == null) {
+			coveredAttributable = new Map<Int, Int>();
+		}
 		lock.sure().acquire();
 		#if debug_log_expression
 		Sys.println(findLogId(logId));
@@ -122,6 +126,11 @@ class CoverageContext {
 			covered.sure().set(logId, covered.sure().get(logId).sure() + 1);
 		} else {
 			covered.sure().set(logId, 1);
+		}
+		if (coveredAttributable.sure().exists(logId)) {
+			coveredAttributable.sure().set(logId, coveredAttributable.sure().get(logId).sure() + 1);
+		} else {
+			coveredAttributable.sure().set(logId, 1);
 		}
 		lock.sure().release();
 	}
@@ -159,15 +168,17 @@ class CoverageContext {
 	}
 	#end
 
-	public function calcStatistic() {
-		if (covered == null) {
-			return;
-		}
-		function getCoverage(id:Int):Int {
-			if (CoverageContext.covered.sure().exists(id)) {
-				return CoverageContext.covered.sure().get(id).sure();
+	public function calcStatistic(coveredData:Null<Map<Int, Int>>) {
+		var coverageCallback = (id:Int) -> 0;
+
+		if (coveredData != null) {
+			final coveredIds:Map<Int, Int> = coveredData.sure();
+			coverageCallback = function getCoverage(id:Int):Int {
+				if (coveredIds.exists(id)) {
+					return coveredIds.get(id).sure();
+				}
+				return 0;
 			}
-			return 0;
 		}
 
 		filesCovered = 0;
@@ -183,7 +194,7 @@ class CoverageContext {
 		linesCovered = 0;
 
 		for (type in types) {
-			type.calcStatistic(getCoverage);
+			type.calcStatistic(coverageCallback);
 			if (type.isCovered()) {
 				typesCovered++;
 			}

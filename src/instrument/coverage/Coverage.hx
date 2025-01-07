@@ -5,16 +5,50 @@ import instrument.coverage.reporter.ICoverageReporter;
 class Coverage {
 	public static var RESOURCE_NAME:String = "coverageTypeInfo";
 
+	static var context:Null<CoverageContext>;
+
+	static function loadContext():CoverageContext {
+		if (context == null) {
+			context = CoverageContext.contextFromJson();
+		}
+		return context.sure();
+	}
+
 	/**
 	 * reports coverage data using reporters provided by caller
 	 *
 	 * @param reporters each reporter can access all recorded coverage data
 	 */
 	public static function endCustomCoverage(reporters:Array<ICoverageReporter>) {
-		var context:CoverageContext = CoverageContext.contextFromJson();
-		context.calcStatistic();
+		final ctxt = loadContext();
+		ctxt.calcStatistic(CoverageContext.covered);
 		for (report in reporters) {
-			report.generateReport(context);
+			report.generateReport(ctxt);
+		}
+	}
+
+	/**
+	 * resets attributable coverage data. 
+	 * 
+	 * use before running a new testcase to zero out coverage counters
+	 *
+	 */
+	public static function resetAttributableCoverage() {
+		CoverageContext.coveredAttributable.clear();
+	}
+
+	/**
+	 * reports attributable coverage data using reporters provided by caller
+	 * 
+	 * use in conjunction with `resetAttributableCoverage` to attribute coverage per individual testcase
+	 *
+	 * @param reporters each reporter can access all recorded coverage data
+	 */
+	public static function reportAttributableCoverage(reporters:Array<ICoverageReporter>) {
+		final ctxt = loadContext();
+		ctxt.calcStatistic(CoverageContext.coveredAttributable);
+		for (report in reporters) {
+			report.generateReport(ctxt);
 		}
 	}
 

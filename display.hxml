@@ -3,6 +3,7 @@
 -cp tests
 
 -lib utest
+-lib safety
 
 # --macro instrument.Instrumentation.init(["demo"], ["haxe"])
 -D profiler-console-detail-reporter

@@ -15,7 +15,7 @@ class NullSafety {
 	@:nullSafety(StrictThreaded)
 	static function func2(o:{field:Null<String>}) {
 		if (o.field != null) {
-			trace(o.field.length);
+			trace(o.field?.length);
 		}
 	}
 }
