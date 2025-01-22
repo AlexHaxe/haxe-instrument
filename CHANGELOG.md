@@ -2,6 +2,13 @@
 
 ## dev branch / next version (1.x.x)
 
+## version 1.4.0 (2025-01-22)
+
+- adjusted line coverage calculation
+- added branch coverage on for expressions
+- fixed LCOV reporter to show partial coverage for branches
+- fixed coverage collection on empty switch cases
+
 ## version 1.3.1 (2025-01-07)
 
 - fixed null reference when resetting attributable coverage for a zero coverage file

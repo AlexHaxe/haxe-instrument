@@ -533,7 +533,8 @@ class Instrumentation {
 
 			case EFor(it, e):
 				it = instrumentExpr(it);
-				e = instrumentExpr(ensureBlockExpr(e));
+				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
+				e = coverBranch(instrumentExpr(ensureBlockExpr(e)), e.pos, branchesInfo);
 				{expr: EFor(it, e), pos: expr.pos};
 
 			case EWhile(econd, e, normal):
@@ -595,16 +596,33 @@ class Instrumentation {
 				var branchesInfo:BranchesInfo = makeBranchesInfo(expr);
 
 				e = instrumentExpr(e);
-				if ((edef != null) && (edef.expr != null)) {
-					edef = coverBranch(instrumentExpr(ensureBlockExpr(edef)), expr.pos, branchesInfo);
+				if (edef != null) {
+					if (edef.expr != null) {
+						edef = coverBranch(instrumentExpr(ensureBlockExpr(edef)), expr.pos, branchesInfo);
+					} else {
+						// unfortunately empty default branch does not have a position we can use
+						edef = coverBranch(null, e.pos, branchesInfo);
+					}
 				}
 
 				for (c in cases) {
 					if (c.expr == null) {
-						c.expr = coverBranch(null, expr.pos, branchesInfo);
+						var pos = expr.pos;
+						var refExpr = null;
+						if (c.values.length > 0) {
+							var pos1 = PositionTools.getInfos(c.values[0].pos);
+							var pos2 = PositionTools.getInfos(c.values[c.values.length - 1].pos);
+							pos = PositionTools.make({
+								file: pos1.file,
+								min: pos1.min,
+								max: pos2.max
+							});
+							refExpr = logExpression(c.values[0]);
+						}
+						c.expr = coverBranch(refExpr, pos, branchesInfo);
 						continue;
 					}
-					c.expr = coverBranch(instrumentExpr(ensureBlockExpr(c.expr)), expr.pos, branchesInfo);
+					c.expr = coverBranch(instrumentExpr(ensureBlockExpr(c.expr)), c.expr.pos, branchesInfo);
 				}
 				{expr: ESwitch(e, cases, edef), pos: expr.pos};
 
@@ -883,8 +901,13 @@ class Instrumentation {
 			case Coverage:
 			case Both:
 		}
-		var location:Location = PositionTools.toLocation(cond.pos);
+		var location:Location = PositionTools.toLocation(ifExpr.pos);
 		var branchTrue:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
+		if (elseExpr == null) {
+			location = PositionTools.toLocation(cond.pos);
+		} else {
+			location = PositionTools.toLocation(elseExpr.pos);
+		}
 		var branchFalse:BranchInfo = new BranchInfo(coverageContext.nextId(), location.locationToString(), location.range.start.line, location.range.end.line);
 		branchesInfo.addBranch(branchTrue);
 		branchesInfo.addBranch(branchFalse);

@@ -53,8 +53,12 @@ class BranchesInfo {
 
 	function calcLineCoverage() {
 		var lineCov:LineCoverage = new LineCoverage();
-		for (branch in branches) {
-			lineCov.addlines(branch.startLine, branch.endLine, branch.isCovered());
+		if (!isCovered()) {
+			lineCov.addlines(startLine, endLine, false);
+		} else {
+			for (branch in branches) {
+				lineCov.addlines(branch.startLine, branch.endLine, branch.isCovered());
+			}
 		}
 		lineCount = lineCov.lineCount();
 		linesCovered = lineCov.coveredLines.length;

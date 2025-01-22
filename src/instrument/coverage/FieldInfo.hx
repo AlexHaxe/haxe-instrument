@@ -69,13 +69,16 @@ class FieldInfo {
 
 	function calcLineCoverage() {
 		var lineCov:LineCoverage = new LineCoverage();
-
-		for (expression in expressions) {
-			lineCov.addlines(expression.startLine, expression.endLine, expression.isCovered());
-		}
-		for (branch in branches) {
-			for (b in branch.branches) {
-				lineCov.addlines(b.startLine, b.endLine, b.isCovered());
+		if (!isCovered()) {
+			lineCov.addlines(startLine, endLine, false);
+		} else {
+			for (branch in branches) {
+				for (b in branch.branches) {
+					lineCov.addlines(b.startLine, b.endLine, b.isCovered());
+				}
+			}
+			for (expression in expressions) {
+				lineCov.addlines(expression.startLine, expression.endLine, expression.isCovered());
 			}
 		}
 		lineCount = lineCov.lineCount();

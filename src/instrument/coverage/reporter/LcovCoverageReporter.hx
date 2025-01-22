@@ -82,58 +82,42 @@ class LcovCoverageReporter extends FileBaseReporter implements ICoverageReporter
 		for (type in types) {
 			final fileName = type.location.substring(0, type.location.indexOf(":"));
 			for (field in type.fields) {
+				if (!field.location.startsWith(fileName)) {
+					continue;
+				}
+				if (maxLineNumber < field.endLine) {
+					maxLineNumber = field.endLine;
+				}
 				if (!field.isCovered()) {
-					if (!field.location.startsWith(fileName)) {
-						continue;
-					}
 					for (line in field.startLine...field.endLine + 1) {
-						var count:Int = 0;
-						if (!lineCov.exists(line)) {
-							lineCov.set(line, 0);
-							continue;
-						}
-						count = lineCov.get(line).sure();
 						lineCov.set(line, 0);
-					}
-					if (maxLineNumber < field.endLine) {
-						maxLineNumber = field.endLine;
 					}
 					continue;
 				}
 				for (expr in field.expressions) {
-					if (expr.location.startsWith(fileName)) {
-						for (line in expr.startLine...expr.endLine + 1) {
-							var count:Int = 0;
-							if (!lineCov.exists(line)) {
-								lineCov.set(line, expr.count);
-								continue;
-							}
-							count = lineCov.get(line).sure();
-							if (count <= expr.count) {
-								continue;
-							}
+					if (maxLineNumber < expr.endLine) {
+						maxLineNumber = expr.endLine;
+					}
+					for (line in expr.startLine...expr.endLine + 1) {
+						var count:Int = 0;
+						if (!lineCov.exists(line)) {
 							lineCov.set(line, expr.count);
-						}
-						if (maxLineNumber < expr.endLine) {
-							maxLineNumber = expr.endLine;
-						}
-					}
-				}
-			}
-		}
-		for (type in types) {
-			final fileName = type.location.substring(0, type.location.indexOf(":"));
-			for (field in type.fields) {
-				for (branches in field.branches) {
-					if (!branches.location.startsWith(fileName)) {
-						continue;
-					}
-					for (branch in branches.branches) {
-						if (branch.count > 0) {
 							continue;
 						}
+						count = lineCov.get(line).sure();
+						if (count <= expr.count) {
+							continue;
+						}
+						lineCov.set(line, expr.count);
+					}
+				}
+
+				for (branches in field.branches) {
+					for (branch in branches.branches) {
 						for (line in branch.startLine...branch.endLine + 1) {
-							lineCov.set(line, branch.count);
+							if (branch.count > 0) {
+								lineCov.set(line, branch.count);
+							}
 						}
 						if (maxLineNumber < branch.endLine) {
 							maxLineNumber = branch.endLine;
